@@ -27,7 +27,16 @@ const bot = new Discord.Client({
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 const commands = new Discord.Collection()
 
-bot.login(config.token)
+// Check environment and get right token
+let token
+if(config.dev) {
+  token = config.token_test
+}else{
+  token = config.token
+}
+// ----------------------------------
+
+bot.login(token)
 
 bot.on('ready', async () => {
   console.log(`
@@ -56,6 +65,10 @@ bot.on('ready', async () => {
     debug.log('The current path the bot resides in contains spaces. Please move it somewhere that does not contain spaces.', 'error', true)
     process.exit()
   }
+
+  const env = config.dev ? 'DEV' : 'PROD'
+  debug.log(`Current environment is ${env}`, 'info', true)
+
 
   // Read all files in commands/ and add them to the commands collection
   for (const command of fs.readdirSync('./commands/')) {

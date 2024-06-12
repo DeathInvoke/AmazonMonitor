@@ -7,6 +7,7 @@ declare module NodeJS {
 interface Config {
   prefix: string
   token: string
+  token_test: string
   minutes_per_check: number
   seconds_between_check: number
   url_params: {
@@ -16,6 +17,7 @@ interface Config {
   cache_limit: number
   required_perms: import('discord.js').PermissionResolvable[]
   tld: string
+  dev: boolean
   auto_cart_link: boolean
   debug_enabled: boolean
   custom_chromium_exec: string

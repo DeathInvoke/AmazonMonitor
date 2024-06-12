@@ -3,6 +3,7 @@ import { addWatchlistItem, getWatchlist } from '../common/watchlist.js'
 import { Client, Message } from 'discord.js'
 import { category, item, search } from '../common/amazon.js'
 import { parseArgs } from '../common/arguments.js'
+import {contents} from 'cheerio/lib/api/traversing.js'
 
 const { cache_limit, tld, guild_item_limit }: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -185,9 +186,10 @@ async function run(bot: Client, message: Message, args: string[]) {
   }}
 
   // Add the extras for price difference, price percentage, and price limit
+  const currency = `${processed.symbol || '$'}`
   if (processed.priceLimit) {
     // @ts-ignore we null check this
-    response += `\nPrice must be below ${processed?.symbol || '$'}${processed.priceLimit}`
+    response += `\nPrice must be below ${currency}${processed.priceLimit}`
   }
 
   if (processed.pricePercentage) {
@@ -196,8 +198,8 @@ async function run(bot: Client, message: Message, args: string[]) {
 
   if (processed.difference) {
     // @ts-ignore we null check this
-    response += `\nPrice must be more than ${processed?.symbol || '$'}${processed.difference} off previous detected price`
+    response += `\nPrice must be more than ${currency}${processed.difference} off previous detected price`
   }
 
-  message.channel.send(response)
+  message.channel.send({tts: false, content: response})
 }
