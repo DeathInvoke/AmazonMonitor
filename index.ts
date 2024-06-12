@@ -1,3 +1,4 @@
+// @ts-ignore
 import Discord, { Partials } from 'discord.js'
 import fs from 'fs'
 import * as debug from './common/debug.js'
@@ -73,12 +74,11 @@ bot.on('ready', async () => {
   debug.log('Bot is ready!', 'info')
 })
 
-bot.on('messageCreate', function (message) {
+bot.on('messageCreate', function (message: Discord.Message) {
   if (message.author.bot || !message.content.startsWith(config.prefix)) return
 
   const command = message.content.split(config.prefix)[1].split(' ')[0],
     args = message.content.split(' '),
-    // @ts-expect-error This is fine, it's just how the import works
     cmd = commands.get(command)?.default
 
   if (cmd) {

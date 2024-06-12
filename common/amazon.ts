@@ -80,11 +80,11 @@ export async function category(url: string) {
   const topRated = $('.octopus-best-seller-card .octopus-pc-card-content li.octopus-pc-item').toArray()
   
   // @ts-expect-error
-  categoryObj.list = topRated.map(() => {
-    const item = $(this).find('.octopus-pc-item-link')
+  categoryObj.list = topRated.map((obj) => {
+    const item = $(obj).find('.octopus-pc-item-link')
     const asin = item.attr('href').split('/dp/')[1].split('?')[0].replace(/\//g, '')
     const name = item.attr('title')
-    const priceFull = $(this).find('.octopus-pc-asin-price').text().trim()
+    const priceFull = $(obj).find('.octopus-pc-asin-price').text().trim()
     const price = priceFormat(priceFull.replace(/[a-zA-Z]/g, ''))
 
     return {

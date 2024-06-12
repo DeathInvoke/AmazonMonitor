@@ -114,6 +114,8 @@ async function categoryCheck(cat: CategoryItem) {
     cat.cache.find((o) => o.asin === ni.asin)
   )
 
+  debug.log(`Total items in category: ${itemsToCompare.length}`, 'info')
+
   const notifications: NotificationData[] = []
 
   // Compare new items to cache and alert on price change
