@@ -14,12 +14,12 @@ export default {
 async function run(bot: Client, message: Message) {
   const rows = await getWatchlist()
   const links = rows.map((row, i) => {
+    const currency = `${row.symbol || '$'}`
     if (row.type === 'link') {
       // @ts-ignore This is fine
       let str = `**${i + 1}. ${trim(row.itemName, 100)}\n${row.link}**`
-
       if (row.priceLimit) {
-        str += `Price must be below ${row.symbol || '$'}${row.priceLimit}\n`
+        str += `Price must be below ${currency}${row.priceLimit}\n`
       }
 
       if (row.pricePercentage) {
@@ -27,7 +27,7 @@ async function run(bot: Client, message: Message) {
       }
 
       if (row.difference) {
-        str += `Price must be more than ${row.symbol || '$'}${row.difference} off previous detected price\n`
+        str += `Price must be more than ${currency}${row.difference} off previous detected price\n`
       }
 
       return str
@@ -38,7 +38,7 @@ async function run(bot: Client, message: Message) {
       let str = `**${i + 1}. ${trim(row.query, 100)}**`
 
       if (row.priceLimit) {
-        str += `Price must be below ${row.symbol || '$'}${row.priceLimit}\n`
+        str += `Price must be below ${currency}${row.priceLimit}\n`
       }
 
       if (row.pricePercentage) {
@@ -46,7 +46,7 @@ async function run(bot: Client, message: Message) {
       }
 
       if (row.difference) {
-        str += `Price must be more than ${row.symbol || '$'}${row.difference} off previous detected price\n`
+        str += `Price must be more than ${currency}${row.difference} off previous detected price\n`
       }
 
       return str
@@ -57,7 +57,7 @@ async function run(bot: Client, message: Message) {
       let str = `**${i + 1}. ${trim(row.name, 100)}**`
 
       if (row.priceLimit) {
-        str += `Price must be below ${row.symbol || '$'}${row.priceLimit}\n`
+        str += `Price must be below ${currency}${row.priceLimit}\n`
       }
 
       if (row.pricePercentage) {
@@ -65,7 +65,7 @@ async function run(bot: Client, message: Message) {
       }
 
       if (row.difference) {
-        str += `Price must be more than ${row.symbol || '$'}${row.difference} off previous detected price\n`
+        str += `Price must be more than ${currency}${row.difference} off previous detected price\n`
       }
 
       return str
