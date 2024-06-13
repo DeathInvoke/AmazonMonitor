@@ -1,6 +1,8 @@
-import { Client, EmbedBuilder } from 'discord.js'
+import {Client, EmbedBuilder, TextChannel} from 'discord.js'
 import fs from 'fs'
-import { parseParams, priceFormat } from './utils.js'
+import {parseParams, priceFormat} from './utils.js'
+// @ts-ignore
+import {NotificationData} from '../global.js'
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
@@ -37,29 +39,44 @@ export async function sendInStock(bot: Client, notification: NotificationData) {
       name: 'AmazonMonitor'
     })
     .setThumbnail(notification.image)
-    .setDescription(`New Price: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
+    .setDescription(`Nuovo prezzo: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
     .setColor('Green')
-    
-  const channel = await bot.channels.fetch(notification.channelId)
+
+  await sendToNotifyChannel(bot, embed)
+
+  // const channel = await bot.channels.fetch(notification.channelId)
 
   // @ts-ignore This can never be a category channel
-  channel.send({ embeds: [embed] })
+  //channel.send({ embeds: [embed] })
 }
 
 export async function sendPriceChange(bot: Client, notification: NotificationData) {
   const embed = new EmbedBuilder()
-    .setTitle(`Price alert for "${notification.itemName}"`)
+    .setTitle(`Notifica cambio di prezzo per "${notification.itemName}"`)
     .setAuthor({
       name: 'AmazonMonitor'
     })
     .setThumbnail(notification.image)
-    .setDescription(`Old Price: ${notification.symbol}${priceFormat(notification.oldPrice)}\nNew Price: ${notification.symbol}${notification.newPrice.toFixed(2) + (
+    .setDescription(`Prezzo precedente: ${notification.symbol}${priceFormat(notification.oldPrice)}\nNuovo prezzo: ${notification.symbol}${notification.newPrice.toFixed(2) + (
       notification.coupon > 0 ? ` (${notification.symbol}${notification.coupon.toFixed(2)} off with coupon)` : ''
     )}\n\n${notification.link}`)
     .setColor('Green')
 
-  const channel = await bot.channels.fetch(notification.channelId)
+  await sendToNotifyChannel(bot, embed)
+  //const channel = await bot.channels.fetch(notification.channelId)
 
   // @ts-ignore This can never be a category channel
-  channel.send({ embeds: [embed] })
+  //channel.send({ embeds: [embed] })
+}
+
+// ------------------------------------------------------------
+// ------------------------------------------------------------
+
+async function sendToNotifyChannel(bot: Client, embed: EmbedBuilder) {
+  const DROP_NOTIFY_CHANNEL_NAME = 'drop'
+  // @ts-ignore
+  const dropChannel = bot.channels.cache.find(value => value.isTextBased && value['name'] === DROP_NOTIFY_CHANNEL_NAME)
+  if (dropChannel instanceof TextChannel) {
+    await dropChannel.send({embeds: [embed]})
+  }
 }

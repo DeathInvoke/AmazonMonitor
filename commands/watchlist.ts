@@ -5,7 +5,7 @@ import debug from '../common/debug.js'
 
 export default {
   name: 'watchlist',
-  description: 'Display a list of each Amazon link currenty being watched in this server',
+  description: 'Display a list of each Amazon link currently being watched in this server',
   usage: 'watchlist',
   type: 'view',
   run
