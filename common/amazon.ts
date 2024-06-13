@@ -59,10 +59,15 @@ export async function category(url: string) {
   if (ie?.includes('&')) ie = ie.split('&')[0]
 
   const tld = url.split('amazon.')[1].split('/')[0]
-  const path = url.split(tld + '/')[1].split('?')[0]
+  const path = url.split(tld + '/')[1].split('/?')[0]
+  let parsedUrl = `https://www.amazon.${tld}/${path}/?`
+  if(ie){
+    parsedUrl += `ie=${ie}&`
+  }
+  parsedUrl += `node=${node}`
 
   // Get parsed page with puppeteer/cheerio
-  const $ = await getPage(`https://www.amazon.${tld}/${path}/?ie=${ie}&node=${node}`).catch(e => {
+  const $ = await getPage(parsedUrl).catch(e => {
     debug.log(e, 'error')
   })
 

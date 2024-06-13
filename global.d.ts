@@ -21,6 +21,7 @@ interface Config {
   auto_cart_link: boolean
   debug_enabled: boolean
   custom_chromium_exec: string
+  notification_channel_name: string
 }
 
 interface Command {

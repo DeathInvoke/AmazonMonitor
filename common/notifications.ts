@@ -4,6 +4,8 @@ import {parseParams, priceFormat} from './utils.js'
 // @ts-ignore
 import {NotificationData} from '../global.js'
 
+const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -42,12 +44,7 @@ export async function sendInStock(bot: Client, notification: NotificationData) {
     .setDescription(`Nuovo prezzo: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
     .setColor('Green')
 
-  await sendToNotifyChannel(bot, embed)
-
-  // const channel = await bot.channels.fetch(notification.channelId)
-
-  // @ts-ignore This can never be a category channel
-  //channel.send({ embeds: [embed] })
+  await sendToNotifyChannel(bot, notification, embed)
 }
 
 export async function sendPriceChange(bot: Client, notification: NotificationData) {
@@ -62,21 +59,25 @@ export async function sendPriceChange(bot: Client, notification: NotificationDat
     )}\n\n${notification.link}`)
     .setColor('Green')
 
-  await sendToNotifyChannel(bot, embed)
-  //const channel = await bot.channels.fetch(notification.channelId)
-
-  // @ts-ignore This can never be a category channel
-  //channel.send({ embeds: [embed] })
+  await sendToNotifyChannel(bot, notification, embed)
 }
 
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-async function sendToNotifyChannel(bot: Client, embed: EmbedBuilder) {
-  const DROP_NOTIFY_CHANNEL_NAME = 'drop'
-  // @ts-ignore
-  const dropChannel = bot.channels.cache.find(value => value.isTextBased && value['name'] === DROP_NOTIFY_CHANNEL_NAME)
-  if (dropChannel instanceof TextChannel) {
-    await dropChannel.send({embeds: [embed]})
+async function sendToNotifyChannel(bot: Client, notification: NotificationData, embed: EmbedBuilder) {
+
+  const channel = await _getNotificationChannel(bot, notification)
+  if (channel instanceof TextChannel) {
+    await channel.send({embeds: [embed]})
+  }
+}
+
+async function _getNotificationChannel(bot: Client, notification: NotificationData) {
+  if(config.notification_channel_name){
+    // @ts-ignore
+    return bot.channels.cache.find(value => value.isTextBased && value['name'] === config.notification_channel_name)
+  }else{
+    return await bot.channels.fetch(notification.channelId)
   }
 }
