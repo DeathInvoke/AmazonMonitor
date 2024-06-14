@@ -8,6 +8,7 @@ const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
   //const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+  const channels = config.notification_channels
 
   for (const notif of notifications) {
     // If we have url_params, add them to the URL
@@ -17,7 +18,7 @@ export async function sendNotifications(bot: Client, notifications: Notification
 
     if (notif.oldPrice === 0 && notif.newPrice !== 0) {
       // Old price was 0 but new price isn't? Item is now in stock!
-      await sendInStock(bot, notif)
+      await sendInStock(bot, notif, channels.get('restocks'))
     }
 
     // Now we check if the price differences meet all of the provided criteria
@@ -29,12 +30,12 @@ export async function sendNotifications(bot: Client, notifications: Notification
     const priceNotZero = notif.newPrice !== 0
 
     if (meetsPriceLimit && meetsPricePercentage && meetsDifference && priceNotZero) {
-      await sendPriceChange(bot, notif)
+      await sendPriceChange(bot, notif, channels.get('price_drops'))
     }
   }
 }
 
-export async function sendInStock(bot: Client, notification: NotificationData) {
+export async function sendInStock(bot: Client, notification: NotificationData, channel: string) {
   const embed = new EmbedBuilder()
     .setTitle(`In-stock alert for "${notification.itemName}"`)
     .setAuthor({
@@ -44,10 +45,10 @@ export async function sendInStock(bot: Client, notification: NotificationData) {
     .setDescription(`Nuovo prezzo: ${notification.symbol} ${notification.newPrice}\n\n${notification.link}`)
     .setColor('Green')
 
-  await sendToNotifyChannel(bot, notification, embed)
+  await sendToNotifyChannel(bot, notification, embed, channel)
 }
 
-export async function sendPriceChange(bot: Client, notification: NotificationData) {
+export async function sendPriceChange(bot: Client, notification: NotificationData, channel: string) {
   const embed = new EmbedBuilder()
     .setTitle(`Notifica cambio di prezzo per "${notification.itemName}"`)
     .setAuthor({
@@ -59,24 +60,24 @@ export async function sendPriceChange(bot: Client, notification: NotificationDat
     )}\n\n${notification.link}`)
     .setColor('Green')
 
-  await sendToNotifyChannel(bot, notification, embed)
+  await sendToNotifyChannel(bot, notification, embed, channel)
 }
 
 // ------------------------------------------------------------
 // ------------------------------------------------------------
 
-async function sendToNotifyChannel(bot: Client, notification: NotificationData, embed: EmbedBuilder) {
+async function sendToNotifyChannel(bot: Client, notification: NotificationData, embed: EmbedBuilder, channelName: string) {
 
-  const channel = await _getNotificationChannel(bot, notification)
+  const channel = await _getNotificationChannel(bot, notification, channelName)
   if (channel instanceof TextChannel) {
     await channel.send({embeds: [embed]})
   }
 }
 
-async function _getNotificationChannel(bot: Client, notification: NotificationData) {
+async function _getNotificationChannel(bot: Client, notification: NotificationData, channelName: string) {
   if(config.notification_channel_name){
     // @ts-ignore
-    return bot.channels.cache.find(value => value.isTextBased && value['name'] === config.notification_channel_name)
+    return bot.channels.cache.find(value => value.isTextBased && value['name'] === channelName)
   }else{
     return await bot.channels.fetch(notification.channelId)
   }
