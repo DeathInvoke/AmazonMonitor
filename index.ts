@@ -4,6 +4,7 @@ import fs from 'fs'
 import * as debug from './common/debug.js'
 import { initBrowser } from './common/browser.js'
 import { startWatcher } from './common/watcher.js'
+import { main } from './common/categories.js'
 
 declare global {
   var browser: import('puppeteer').Browser
@@ -48,7 +49,7 @@ bot.on('ready', async () => {
 \\____|__  /__|_|  (____  /_____ \\____/|___|  /   \\__/\\  /  (____  /__|  \\___  >___|  /\\___  >__|   
         \\/      \\/     \\/      \\/          \\/         \\/        \\/          \\/     \\/     \\/       
 
-  by SpikeHD
+  by DeathInvoke
   ##########################################################################
   `)
 

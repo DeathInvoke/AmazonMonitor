@@ -116,3 +116,5 @@ yarn.lock
 
 # typescript build
 built/
+
+.idea/

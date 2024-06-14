@@ -7,7 +7,7 @@ import {NotificationData} from '../global.js'
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
-  const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+  //const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
   for (const notif of notifications) {
     // If we have url_params, add them to the URL

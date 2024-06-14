@@ -1,8 +1,10 @@
 import fs from 'fs'
-import { CheerioAPI } from 'cheerio'
-import { getPage } from './browser.js'
+import {CheerioAPI} from 'cheerio'
+import {getPage} from './browser.js'
 import debug from './debug.js'
-import { linkToAsin, parseParams, priceFormat } from './utils.js'
+import {linkToAsin, parseParams, priceFormat} from './utils.js'
+
+import {main} from './categories.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -11,7 +13,7 @@ export async function search(query: string, suffix: string) {
   const url = `https://www.amazon.${suffix}/s?k=${sanq}`
   const results: SearchData[] = []
   const foundAsins: string[] = []
-
+  await main()
   const $ = await getPage(url)
   const limit = $('.s-result-list').find('.s-result-item').length
 
@@ -52,6 +54,7 @@ export async function search(query: string, suffix: string) {
 }
 
 export async function category(url: string) {
+  await main()
   let node = url.split('node=')[1]
   if (node?.includes('&')) node = node.split('&')[0]
 
@@ -61,7 +64,7 @@ export async function category(url: string) {
   const tld = url.split('amazon.')[1].split('/')[0]
   const path = url.split(tld + '/')[1].split('/?')[0]
   let parsedUrl = `https://www.amazon.${tld}/${path}/?`
-  if(ie){
+  if (ie) {
     parsedUrl += `ie=${ie}&`
   }
   parsedUrl += `node=${node}`
@@ -83,7 +86,7 @@ export async function category(url: string) {
   }
 
   const topRated = $('.octopus-best-seller-card .octopus-pc-card-content li.octopus-pc-item').toArray()
-  
+
   // @ts-expect-error
   categoryObj.list = topRated.map((obj) => {
     const item = $(obj).find('.octopus-pc-item-link')
@@ -106,7 +109,7 @@ export async function category(url: string) {
 
   // Node set for validation
   categoryObj.node = node
-  
+
   return categoryObj
 }
 
@@ -125,7 +128,7 @@ export async function item(url: string) {
   const category = $('#wayfinding-breadcrumbs_container').find('.a-list-item').find('a').text().trim().toLowerCase()
   let emptyVals = 0
   let item: ProductInfo
-  
+
   switch (category) {
   case 'kindle store':
   case 'books':
@@ -137,17 +140,17 @@ export async function item(url: string) {
 
   Object.keys(item).forEach((k: keyof ProductInfo) => {
     // @ts-ignore
-    if(typeof item[k] === 'string' && item[k].length === 0) emptyVals++
+    if (typeof item[k] === 'string' && item[k].length === 0) emptyVals++
   })
 
-  if(emptyVals > 1) debug.log(`Detected ${emptyVals} empty values. Could potentially mean bot was flagged`, 'warn')
+  if (emptyVals > 1) debug.log(`Detected ${emptyVals} empty values. Could potentially mean bot was flagged`, 'warn')
 
   return item
 }
 
 async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
   debug.log('Detected as a regular item', 'debug')
-  
+
   let couponDiscount = 0
 
   // Get the coupon price, if it exists
@@ -175,7 +178,7 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
   // Most items have feature lists
   const features = $('#feature-bullets').find('li').find('span').toArray()
   const parsedFeatures: string[] = []
-  
+
   features.forEach(f => {
     // Get features in a more normal format
     parsedFeatures.push(` - ${$(f).text().trim()}`)
@@ -258,8 +261,8 @@ async function parseBook($: CheerioAPI, url: string): Promise<ProductInfo> {
   buyingOptions.forEach(o => {
     const type = $(o).find('.a-button-inner').find('span').first().text().trim()
     const price = priceFormat($(o).find('.a-button-inner').find('span').eq(1).text().trim())
-    
-    if(price.length > 1 && !type.toLowerCase().includes('audiobook')) optionsArray.push(` - ${type}: ${price}`)
+
+    if (price.length > 1 && !type.toLowerCase().includes('audiobook')) optionsArray.push(` - ${type}: ${price}`)
   })
 
   const book: ProductInfo = {

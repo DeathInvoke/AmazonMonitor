@@ -124,3 +124,9 @@ interface ProductInfo extends PartialProductInfo {
   features: string[];
   availability: string;
 }
+
+interface CategoryNode {
+  name: string;
+  id: number;
+  subCategories: CategoryNode[];
+}

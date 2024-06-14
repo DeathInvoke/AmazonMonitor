@@ -1,9 +1,9 @@
-import pup, { Browser } from 'puppeteer'
+import pup from 'puppeteer'
 import useProxy from '@lem0-packages/puppeteer-page-proxy'
 import fs from 'fs'
 import debug from './debug.js'
-import { load } from 'cheerio'
-import { linkToAsin } from './utils.js'
+import {load} from 'cheerio'
+import {linkToAsin} from './utils.js'
 
 const userAgents = [
   'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0',
@@ -14,13 +14,11 @@ const userAgents = [
 
 export async function initBrowser() {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
-  const browser = await pup.launch({
+  global.browser = await pup.launch({
     headless: 'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-    ...(config.custom_chromium_exec && { executablePath: config.custom_chromium_exec })
+    ...(config.custom_chromium_exec && {executablePath: config.custom_chromium_exec})
   })
-
-  global.browser = browser
 }
 
 export async function getPage(url: string) {
