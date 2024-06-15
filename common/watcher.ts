@@ -18,7 +18,7 @@ export async function startWatcher(bot: Client) {
   setInterval(async () => {
     const rows = await getWatchlist()
 
-    debug.log('Checking prices...')
+    debug.log('Controllo prezzi...')
 
     if (rows.length > 0) doCheck(bot, 0)
   }, config.minutes_per_check * 60 * 1000)
@@ -48,7 +48,7 @@ export async function doCheck(bot: Client, i: number) {
   }
 
   if (result) {
-    sendNotifications(bot, result)
+    await sendNotifications(bot, result)
   }
 
   // If this is not the last index in the array, run the next check
@@ -76,8 +76,8 @@ async function itemCheck(product: LinkItem) {
   const underPriceLimit = product.priceLimit ? newPrice <= product.priceLimit : true
 
   debug.log(`Under price limit? ${underPriceLimit}...`, 'debug')
-  debug.log(`New price: ${newPrice}...`, 'debug')
-  debug.log(`Old price: ${product.lastPrice}...`, 'debug')
+  debug.log(`Nuovo prezzo: ${newPrice}...`, 'debug')
+  debug.log(`Vecchio prezzo: ${product.lastPrice}...`, 'debug')
 
   if (newPrice !== -1 && underPriceLimit && product.lastPrice > newPrice) {
     debug.log('Sending notification...', 'debug')
@@ -114,7 +114,7 @@ async function categoryCheck(cat: CategoryItem) {
     cat.cache.find((o) => o.asin === ni.asin)
   )
 
-  debug.log(`Total items in category: ${itemsToCompare.length}`, 'info')
+  debug.log(`Numero di oggetti nella categoria: ${itemsToCompare.length}`, 'info')
 
   const notifications: NotificationData[] = []
 
@@ -149,7 +149,7 @@ async function categoryCheck(cat: CategoryItem) {
     cache: newItems.list,
   }
 
-  debug.log(`${total} item(s) changed`, 'debug')
+  debug.log(`${total} oggetto/i cambiato/i`, 'debug')
 
   // Remove old stuff
   await removeWatchlistItem(cat.link)

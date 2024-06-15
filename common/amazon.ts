@@ -4,7 +4,7 @@ import {getPage} from './browser.js'
 import debug from './debug.js'
 import {linkToAsin, parseParams, priceFormat} from './utils.js'
 
-import {main} from './categories.js'
+import {scanCategories} from './categories.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -13,7 +13,7 @@ export async function search(query: string, suffix: string) {
   const url = `https://www.amazon.${suffix}/s?k=${sanq}`
   const results: SearchData[] = []
   const foundAsins: string[] = []
-  await main()
+  //await main()
   const $ = await getPage(url)
   const limit = $('.s-result-list').find('.s-result-item').length
 
@@ -54,7 +54,6 @@ export async function search(query: string, suffix: string) {
 }
 
 export async function category(url: string) {
-  await main()
   let node = url.split('node=')[1]
   if (node?.includes('&')) node = node.split('&')[0]
 

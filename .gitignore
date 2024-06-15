@@ -117,4 +117,5 @@ yarn.lock
 # typescript build
 built/
 
-.idea/
+.idea/**
+.idea/codeStyles/Project.xml

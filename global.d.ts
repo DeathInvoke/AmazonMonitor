@@ -22,7 +22,14 @@ interface Config {
   debug_enabled: boolean
   custom_chromium_exec: string
   notification_channels: Map<string, string>
-  notification_channel_name: string
+  category_config: CategoryConfig
+}
+
+interface CategoryConfig{
+  scan: boolean
+  max_categories_per_sub: number | 5
+  full_scan: boolean
+  tree_level: number | 1
 }
 
 interface Command {

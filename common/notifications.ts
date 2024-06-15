@@ -37,7 +37,7 @@ export async function sendNotifications(bot: Client, notifications: Notification
 
 export async function sendInStock(bot: Client, notification: NotificationData, channel: string) {
   const embed = new EmbedBuilder()
-    .setTitle(`In-stock alert for "${notification.itemName}"`)
+    .setTitle(`Restock per "${notification.itemName}"`)
     .setAuthor({
       name: 'AmazonMonitor'
     })
@@ -75,7 +75,7 @@ async function sendToNotifyChannel(bot: Client, notification: NotificationData, 
 }
 
 async function _getNotificationChannel(bot: Client, notification: NotificationData, channelName: string) {
-  if(config.notification_channel_name){
+  if(channelName){
     // @ts-ignore
     return bot.channels.cache.find(value => value.isTextBased && value['name'] === channelName)
   }else{
