@@ -4,8 +4,6 @@ import {getPage} from './browser.js'
 import debug from './debug.js'
 import {linkToAsin, parseParams, priceFormat} from './utils.js'
 
-import {scanCategories} from './categories.js'
-
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function search(query: string, suffix: string) {

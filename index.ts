@@ -5,6 +5,7 @@ import * as debug from './common/debug.js'
 import {initBrowser} from './common/browser.js'
 import {startWatcher} from './common/watcher.js'
 import {getCategoryTree} from './common/categories.js'
+import {startServer} from './api.js'
 
 declare global {
 	var browser: import('puppeteer').Browser
@@ -84,11 +85,12 @@ bot.on('ready', async () => {
 	await initBrowser()
 
 	if (config.category_config?.scan) {
-		// TODO call categoryTree()
 		await getCategoryTree()
 	}
 
 	await startWatcher(bot)
+
+	startServer()
 
 	debug.log('Bot is ready!', 'info')
 })

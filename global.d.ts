@@ -22,7 +22,8 @@ interface Config {
   debug_enabled: boolean
   custom_chromium_exec: string
   notification_channels: Map<string, string>
-  category_config: CategoryConfig
+  category_config: CategoryConfig,
+  server_port: number | 8080
 }
 
 interface CategoryConfig{
