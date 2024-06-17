@@ -5,13 +5,15 @@ import { addWatchlistItem, getWatchlist, removeWatchlistItem } from './watchlist
 import debug from './debug.js'
 import { item, category, search } from './amazon.js'
 import { sendNotifications } from './notifications.js'
+import {EnvironmentConfig} from '../environment_config.js'
 
-const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const envConfig: EnvironmentConfig = new EnvironmentConfig()
+//const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function startWatcher(bot: Client) {
   const curRows = await getWatchlist()
 
-  bot.user.setActivity(`${curRows.length} items! | ${config.prefix}help`, {
+  bot.user.setActivity(`${curRows.length} items! | ${envConfig.prefix}help`, {
     type: ActivityType.Watching,
   })
 
@@ -21,7 +23,7 @@ export async function startWatcher(bot: Client) {
     debug.log('Controllo prezzi...')
 
     if (rows.length > 0) doCheck(bot, 0)
-  }, config.minutes_per_check * 60 * 1000)
+  }, envConfig.minutes_per_check * 60 * 1000)
 }
 
 export async function doCheck(bot: Client, i: number) {
@@ -55,7 +57,7 @@ export async function doCheck(bot: Client, i: number) {
   if (i < watchlist.length - 1) {
     setTimeout(() => {
       doCheck(bot, i + 1)
-    }, (config?.seconds_between_check || 5) * 1000)
+    }, (envConfig.seconds_between_check || 5) * 1000)
   }
 }
 
@@ -160,7 +162,7 @@ async function categoryCheck(cat: CategoryItem) {
 }
 
 async function queryCheck(query: QueryItem) {
-  const newItems = await search(query.query, config.tld)
+  const newItems = await search(query.query, envConfig.tld)
   const itemsToCompare = newItems.filter((ni) =>
     query.cache.find((o) => o.asin === ni.asin)
   )

@@ -1,7 +1,9 @@
 import fs from 'fs'
 import chalk from 'chalk'
+import {EnvironmentConfig} from '../environment_config.js'
 
-const { debug_enabled }: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+//const { debug_enabled }: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const debug_enabled: EnvironmentConfig = new EnvironmentConfig().debug_enabled
 
 interface LogTypes {
   log: string
