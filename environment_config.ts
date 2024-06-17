@@ -1,7 +1,4 @@
 import dotenv from 'dotenv'
-import path from 'path'
-import {fileURLToPath} from 'url'
-import debug from './common/debug.js'
 
 export class EnvironmentConfig {
 
@@ -91,6 +88,7 @@ export class EnvironmentConfig {
 	}
 
 	constructor() {
+		console.log(process.env.TOKEN)
 		dotenv.config()
 
 		this._prefix = process.env.PREFIX
