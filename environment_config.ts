@@ -3,23 +3,23 @@ import dotenv from 'dotenv'
 export class EnvironmentConfig {
 
 
-	get prefix(): string {
+	get prefix(): any {
 		return this._prefix
 	}
 
-	get token(): string {
+	get token(): any {
 		return this._token
 	}
 
-	get token_test(): string {
+	get token_test(): any {
 		return this._token_test
 	}
 
-	get minutes_per_check(): number {
-		return this._minutes_per_check | 2
+	get minutes_per_check(): any {
+		return this._minutes_per_check
 	}
 
-	get seconds_between_check(): number {
+	get seconds_between_check(): any {
 		return this._seconds_between_check
 	}
 
@@ -27,11 +27,11 @@ export class EnvironmentConfig {
 		return this._url_params
 	}
 
-	get guild_item_limit(): number {
+	get guild_item_limit(): any {
 		return this._guild_item_limit
 	}
 
-	get cache_limit(): number {
+	get cache_limit(): any {
 		return this._cache_limit
 	}
 
@@ -39,19 +39,19 @@ export class EnvironmentConfig {
 		return this._required_perms
 	}
 
-	get tld(): string {
+	get tld(): any {
 		return this._tld
 	}
 
-	get dev(): boolean {
+	get dev(): any {
 		return this._dev
 	}
 
-	get auto_cart_link(): boolean {
+	get auto_cart_link(): any {
 		return this._auto_cart_link
 	}
 
-	get debug_enabled(): boolean {
+	get debug_enabled(): any {
 		return this._debug_enabled
 	}
 
@@ -59,35 +59,36 @@ export class EnvironmentConfig {
 		return this._custom_chromium_exec
 	}
 
-	get notification_channels_price_drops(): string {
+	get notification_channels_price_drops(): any {
 		return this._notification_channels_price_drops
 	}
 
-	get notification_channels_restocks(): string {
+	get notification_channels_restocks(): any {
 		return this._notification_channels_restocks
 	}
 
-	get category_config_scan(): boolean {
+	get category_config_scan(): any {
 		return this._category_config_scan
 	}
 
-	get category_config_full_scan(): boolean {
+	get category_config_full_scan(): any {
 		return this._category_config_full_scan
 	}
 
-	get category_config_max_categories_per_sub(): number {
-		return this._category_config_max_categories_per_sub | 5
+	get category_config_max_categories_per_sub(): any {
+		return this._category_config_max_categories_per_sub
 	}
 
-	get category_config_max_tree_level(): number {
-		return this._category_config_max_tree_level | 1
+	get category_config_max_tree_level(): any {
+		return this._category_config_max_tree_level
 	}
 
-	get server_port(): number {
-		return this._server_port | 8080
+	get server_port(): any {
+		return this._server_port
 	}
 
 	constructor() {
+		console.log(process.env.TOKEN)
 		dotenv.config()
 
 		this._prefix = process.env.PREFIX
@@ -111,6 +112,8 @@ export class EnvironmentConfig {
 		this._category_config_max_categories_per_sub = parseInt(process.env.CATEGORY_CONFIG_MAX_CATEGORIES_PER_SUB)
 		this._category_config_max_tree_level = parseInt(process.env.CATEGORY_CONFIG_MAX_TREE_LEVEL)
 		this._server_port = parseInt(process.env.SERVER_PORT)
+
+		console.log(this.token_test)
 	}
 
 	private _prefix: string

@@ -10,7 +10,7 @@ import {startServer} from './api.js'
 import {EnvironmentConfig} from './environment_config.js'
 
 declare global {
-	let browser: import('puppeteer').Browser
+	var browser: import('puppeteer').Browser
 }
 const envConfig: EnvironmentConfig = new EnvironmentConfig()
 const __dirname = import.meta.url.split('/').slice(0, -1).join('/')
