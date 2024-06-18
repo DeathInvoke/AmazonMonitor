@@ -87,7 +87,7 @@ bot.on('ready', async () => {
 	// Initialize the globally accessible browser
 	await initBrowser()
 
-	if (envConfig.category_config_scan) {
+	if (envConfig.category_envConfig?.scan) {
 		await getCategoryTree()
 	}
 
