@@ -16,11 +16,13 @@ export const CATEGORY_TREE: Map<string, any> = new Map<string, any>()
 
 export async function getCategoryTree() {
 	let treeIndex: number = 0
-	const treeLevel = config.category_config?.tree_level | 1
+	const treeLevel = config.category_config.tree_level
 	const macroCategoryNodes = await _scanMacroCategories()
 	_populateTree(macroCategoryNodes, true)
-	// max_categories_per_sub
-	const max_sub_cat = config.category_config?.max_categories_per_sub
+	if(treeLevel === 0){
+		return
+	}
+	const max_sub_cat = config.category_config.max_categories_per_sub
 	while (treeIndex <= treeLevel) {
 		for (const macro of macroCategoryNodes) {
 
