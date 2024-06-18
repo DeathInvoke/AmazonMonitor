@@ -119,3 +119,4 @@ built/
 
 .idea/**
 .idea/codeStyles/Project.xml
+/category_tree.json
