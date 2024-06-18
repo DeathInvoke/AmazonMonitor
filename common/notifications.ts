@@ -3,23 +3,22 @@ import fs from 'fs'
 import {parseParams, priceFormat} from './utils.js'
 // @ts-ignore
 import {NotificationData} from '../global.js'
-import {EnvironmentConfig} from '../environment_config.js'
 
-const envConfig: EnvironmentConfig = new EnvironmentConfig()
-//const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
   //const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+  const channels = config.notification_channels
 
   for (const notif of notifications) {
     // If we have url_params, add them to the URL
-    /*if (Object.keys(envConfig.url_params).length > 0) {
-      notif.link += parseParams(envConfig.url_params)
-    }*/
+    if (Object.keys(config.url_params).length > 0) {
+      notif.link += parseParams(config.url_params)
+    }
 
     if (notif.oldPrice === 0 && notif.newPrice !== 0) {
       // Old price was 0 but new price isn't? Item is now in stock!
-      await sendInStock(bot, notif, envConfig.notification_channels_restocks)
+      await sendInStock(bot, notif, channels.get('restocks'))
     }
 
     // Now we check if the price differences meet all of the provided criteria
@@ -31,7 +30,7 @@ export async function sendNotifications(bot: Client, notifications: Notification
     const priceNotZero = notif.newPrice !== 0
 
     if (meetsPriceLimit && meetsPricePercentage && meetsDifference && priceNotZero) {
-      await sendPriceChange(bot, notif, envConfig.notification_channels_price_drops)
+      await sendPriceChange(bot, notif, channels.get('price_drops'))
     }
   }
 }

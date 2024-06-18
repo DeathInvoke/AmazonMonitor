@@ -5,28 +5,26 @@ import {CategoryNode} from '../global.js'
 // @ts-ignore
 import {CheerioAPI} from 'cheerio'
 import fs from 'fs'
-import {EnvironmentConfig} from '../environment_config.js'
 
 const BASE_PATH = 'https://www.commercedna.com/'
 const NODE_LOOKUP = 'browseNodeLookup/'
 const EXPLORE_NODE = 'explore.node'
-const envConfig: EnvironmentConfig = new EnvironmentConfig()
 
-//const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 export const CATEGORY_TREE: Map<string, any> = new Map<string, any>()
 
 
 export async function getCategoryTree() {
 	let treeIndex: number = 0
-	const treeLevel = envConfig.category_config_max_tree_level | 1
+	const treeLevel = config.category_config?.tree_level | 1
 	const macroCategoryNodes = await _scanMacroCategories()
 	_populateTree(macroCategoryNodes, true)
 	// max_categories_per_sub
-	const max_sub_cat = envConfig.category_config_max_categories_per_sub
+	const max_sub_cat = config.category_config?.max_categories_per_sub
 	while (treeIndex <= treeLevel) {
 		for (const macro of macroCategoryNodes) {
 
-			const nodeUrl = BASE_PATH + `amazon.${envConfig.tld}/` + NODE_LOOKUP + `${macro.id}.html`
+			const nodeUrl = BASE_PATH + `amazon.${config.tld}/` + NODE_LOOKUP + `${macro.id}.html`
 			const $ = await getPage(nodeUrl)
 
 			let nodeInfos: CategoryNode[] = _extractNodeInfos($)
@@ -73,7 +71,7 @@ function _populateTree(nodes: CategoryNode[], isMacro: boolean, parent?: string)
 
 async function _scanMacroCategories() {
 	debug.log('_scanMacroCategories(): Start extracting macro categories...', 'debug')
-	const startingUrl = BASE_PATH + `amazon.${envConfig.tld}/` + EXPLORE_NODE
+	const startingUrl = BASE_PATH + `amazon.${config.tld}/` + EXPLORE_NODE
 
 	const $ = await getPage(startingUrl)
 

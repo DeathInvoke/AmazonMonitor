@@ -3,10 +3,8 @@ import {CheerioAPI} from 'cheerio'
 import {getPage} from './browser.js'
 import debug from './debug.js'
 import {linkToAsin, parseParams, priceFormat} from './utils.js'
-import {EnvironmentConfig} from '../environment_config.js'
 
-//const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
-const envConfig: EnvironmentConfig = new EnvironmentConfig()
+const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function search(query: string, suffix: string) {
   const sanq = query.replace(/ /g, '+')
@@ -114,8 +112,8 @@ export async function category(url: string) {
 
 export async function item(url: string) {
   // If config contains URL params, add them to the URL
-  if (Object.keys(envConfig.url_params).length > 0) {
-    url += parseParams(envConfig.url_params)
+  if (Object.keys(config.url_params).length > 0) {
+    url += parseParams(config.url_params)
   }
 
   const $ = await getPage(url).catch(e => {
