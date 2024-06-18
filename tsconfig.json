@@ -17,6 +17,7 @@
     "commands/**/*.ts",
     "common/**/*.ts",
     "index.ts",
-    "global.d.ts"
+    "global.d.ts",
+    "api.ts"
   ]
 }
