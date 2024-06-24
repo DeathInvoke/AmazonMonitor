@@ -61,8 +61,10 @@ export async function doCheck(bot: Client, i: number) {
 
 async function itemCheck(product: LinkItem) {
   const newData = await item(product.link)
+  debug.log(`new price arrived => ${newData?.price}`, 'debug')
   // It's possible the item does not have a price, so we gotta anticipate that
-  const newPrice = parseFloat(newData?.price?.replace(/,/g, '')) || -1
+  const newPrice = parseFloat(newData?.price) || -1
+  //const newPrice = parseFloat(newData?.price?.replace(/,/g, '')) || -1
 
   // Push the price change to the watchlist
   if (newPrice !== product.lastPrice) {
@@ -73,7 +75,8 @@ async function itemCheck(product: LinkItem) {
     })
   }
 
-  const underPriceLimit = product.priceLimit ? newPrice <= product.priceLimit : true
+  // const underPriceLimit = product.priceLimit ? newPrice <= product.priceLimit : true
+  const underPriceLimit = product.priceLimit ? newPrice <= product.priceLimit : false
 
   debug.log(`Under price limit? ${underPriceLimit}...`, 'debug')
   debug.log(`Nuovo prezzo: ${newPrice}...`, 'debug')
@@ -86,7 +89,7 @@ async function itemCheck(product: LinkItem) {
       {
         itemName: newData?.fullTitle || 'N/A',
         oldPrice: product.lastPrice,
-        newPrice,
+        newPrice: newPrice,
         link: product.link,
         guildId: product.guildId,
         channelId: product.channelId,

@@ -1,13 +1,13 @@
-import {Client, EmbedBuilder, TextChannel} from 'discord.js'
+import {CategoryChannel, Client, EmbedBuilder, TextChannel} from 'discord.js'
 import fs from 'fs'
 import {parseParams, priceFormat} from './utils.js'
 // @ts-ignore
 import {NotificationData} from '../global.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const tld: string = config.tld
 
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
-  //const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
   const channels = config.notification_channels
 
   for (const notif of notifications) {
@@ -16,7 +16,7 @@ export async function sendNotifications(bot: Client, notifications: Notification
       notif.link += parseParams(config.url_params)
     }
 
-    if (notif.oldPrice === 0 && notif.newPrice !== 0) {
+    if ((notif.oldPrice === 0 || notif.oldPrice != ' ' || notif.oldPrice === -1) && notif.newPrice > 0) {
       // Old price was 0 but new price isn't? Item is now in stock!
       await sendInStock(bot, notif, channels.get('restocks'))
     }
@@ -76,8 +76,10 @@ async function sendToNotifyChannel(bot: Client, notification: NotificationData, 
 
 async function _getNotificationChannel(bot: Client, notification: NotificationData, channelName: string) {
   if(channelName){
-    // @ts-ignore
-    return bot.channels.cache.find(value => value.isTextBased && value['name'] === channelName)
+    return bot.channels.cache.find(value => {
+      // @ts-ignore
+      return value.isTextBased && value.parent['name'] === tld && value['name'] === channelName
+    })
   }else{
     return await bot.channels.fetch(notification.channelId)
   }
