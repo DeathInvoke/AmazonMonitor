@@ -18,13 +18,12 @@ router.get('/health', (req, res) => {
 	res.status(200).send('Ok');
 });
 
-router.get('/category/tree', (req, res) => {
+/*router.get('/category/tree', (req, res) => {
 	res.status(200);
 	res.setHeader('Content-Type', 'application/json');
 	let myObj = Object.fromEntries(CATEGORY_TREE)
-	let myJSON = JSON.stringify(myObj);
 	res.json(JSON.parse(myJSON))
-});
+});*/
 
 app.use('/api/v1', router);
 

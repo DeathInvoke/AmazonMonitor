@@ -1,5 +1,8 @@
 import fs from 'fs'
-const watchFile = './watchlist.json'
+const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
+const tld: string = config.tld
+const watchFile = `./watchlist_${tld}.json`
+
 
 interface Conditions {
   [key: string]: string

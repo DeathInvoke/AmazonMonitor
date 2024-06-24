@@ -18,6 +18,9 @@ export async function getCategoryTree() {
 	let treeIndex: number = 0
 	const treeLevel = config.category_config.tree_level
 	const macroCategoryNodes = await _scanMacroCategories()
+	//TODO: Testing purpose only
+	const sliced = macroCategoryNodes.slice(0, 1)
+	// -------------------------
 	_populateTree(macroCategoryNodes, true)
 	if(treeLevel === 0){
 		return
@@ -49,15 +52,16 @@ export async function getCategoryTree() {
  * @param parent
  */
 function _populateTree(nodes: CategoryNode[], isMacro: boolean, parent?: string) {
-	let info = new Info()
 
 	if (isMacro) {
 		nodes.forEach(node => {
+			let info = new Info()
 			info.url = _buildUrlFromNode(node)
 			CATEGORY_TREE.set(node.name, info)
 		})
 	} else {
 		let listOfMap = nodes.map(node => {
+			let info = new Info()
 			let map = new Map<string, any>()
 			info.url = _buildUrlFromNode(node)
 			map.set(node.name, info)
@@ -83,8 +87,8 @@ async function _scanMacroCategories() {
 function _extractNodeInfos($: CheerioAPI) {
 	const table = $('table')
 	const list: CategoryNode[] = []
-
-	table.find('tbody').find('tr').each((_i, tr) => {
+	//TODO: REMOVE .slice()
+	table.find('tbody').find('tr').slice(0,1).each((_i, tr) => {
 		const _values = $(tr).find('td').map((_i, el) => {
 			return $(el).text().trim()
 		}).toArray()
@@ -106,7 +110,9 @@ function _buildUrlFromNode(node: CategoryNode) {
 // ----------------------------------------------------------
 // ----------------------------------------------------------
 
-class Info {
+export class Info {
 	url: string
 	sub: any
+
+
 }
