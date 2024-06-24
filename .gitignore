@@ -121,3 +121,6 @@ built/
 .idea/codeStyles/Project.xml
 /category_tree.json
 /watchlist_it.json
+/cookies.json
+/localStorage.json
+/sessionStorage.json

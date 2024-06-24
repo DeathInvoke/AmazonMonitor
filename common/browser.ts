@@ -16,10 +16,44 @@ export async function initBrowser() {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
   globalThis.browser = await pup.launch({
     // @ts-ignore
-    headless: 'new',
+    headless: true,//'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     ...(config.custom_chromium_exec && {executablePath: config.custom_chromium_exec})
   })
+}
+
+async function loadCookies(page: pup.Page): Promise<boolean>{
+  let loaded = false
+  const cookiesString = fs.readFileSync("./cookies.json", {encoding: 'utf-8'});
+  if(!cookiesString){
+    return loaded
+  }else{
+    loaded = true
+  }
+  const cookies = JSON.parse(cookiesString);
+
+  const sessionStorageString = fs.readFileSync("./sessionStorage.json", {encoding: 'utf-8'});
+  const sessionStorage = JSON.parse(sessionStorageString);
+
+  const localStorageString = fs.readFileSync("./localStorage.json", {encoding: 'utf-8'});
+  const localStorage = JSON.parse(localStorageString);
+
+  await page.setCookie(...cookies);
+
+  await page.evaluate((data) => {
+    for (const [key, value] of Object.entries(data)) {
+      sessionStorage[key] = value;
+    }
+  }, sessionStorage);
+
+  await page.evaluate((data) => {
+    for (const [key, value] of Object.entries(data)) {
+      localStorage[key] = value;
+    }
+
+  }, sessionStorage);
+
+  return loaded
 }
 
 export async function getPage(url: string) {
@@ -60,7 +94,8 @@ export async function getPage(url: string) {
 
   await page.setUserAgent(uAgent)
   await page.goto(url, { waitUntil: 'domcontentloaded' })
-
+  await loadCookies(page)
+  await page.reload()
   debug.log('Waiting a couple seconds for JavaScript to load...', 'info')
 
   await new Promise(r => setTimeout(r, 1500))

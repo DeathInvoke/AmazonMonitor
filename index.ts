@@ -6,6 +6,7 @@ import {initBrowser} from './common/browser.js'
 import {startWatcher} from './common/watcher.js'
 import {getCategoryTree} from './common/categories.js'
 import {startServer} from './api.js'
+import {login} from './common/amazon.js'
 
 declare global {
 	var browser: import('puppeteer').Browser
@@ -83,6 +84,8 @@ bot.on('ready', async () => {
 
 	// Initialize the globally accessible browser
 	await initBrowser()
+
+	await login()
 
 	if (config.category_config?.scan) {
 		await getCategoryTree()

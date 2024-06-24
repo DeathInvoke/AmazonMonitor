@@ -8,6 +8,8 @@ interface Config {
   prefix: string
   token: string
   token_test: string
+  email: string
+  psw: string
   minutes_per_check: number
   seconds_between_check: number
   url_params: {
