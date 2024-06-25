@@ -136,7 +136,7 @@ export async function getPage(url: string) {
   const html = await page.evaluate(() => document.body.innerHTML).catch(e => debug.log(e, 'error'))
 
   // No need for page to continue to exist
-  page.close()
+  await page.close()
 
   if (!html) {
     debug.log('Failed to load page.', 'error')
@@ -153,4 +153,19 @@ export async function getPage(url: string) {
   }
 
   return $
+}
+
+export async function getPupPage(url: string){
+  debug.log(`URL: ${url}`, 'info')
+
+  const page = await global?.browser.newPage()
+  const uAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
+
+  await page.setUserAgent(uAgent)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await loadCookies(page)
+  await page.reload()
+  debug.log('Waiting a couple seconds for JavaScript to load...', 'info')
+
+  return page
 }
