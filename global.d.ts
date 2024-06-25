@@ -72,6 +72,7 @@ interface LinkItem extends PartialWatchlistItem {
   link: string
   lastPrice: number
   itemName: string
+  autobuy: boolean // Inserted in LinkItem only... in future will be possible to autobuy categories and queries, maybe (?)
 }
 
 interface CategoryItem extends PartialWatchlistItem {
@@ -88,56 +89,56 @@ interface QueryItem extends PartialWatchlistItem {
 type Watchlist = Array<LinkItem | CategoryItem | QueryItem>
 
 interface SearchData {
-  fullTitle: string;
-  ratings: string;
-  coupon: number;
-  price: string;
-  lastPrice: number;
-  symbol: string;
-  sale: string;
-  asin: string;
-  fullLink: string;
-  image: string;
+  fullTitle: string
+  ratings: string
+  coupon: number
+  price: string
+  lastPrice: number
+  symbol: string
+  sale: string
+  asin: string
+  fullLink: string
+  image: string
 }
 
 interface Category {
-  name: string;
-  link: string;
-  list: CategoryData[];
-  node: string;
+  name: string
+  link: string
+  list: CategoryData[]
+  node: string
 }
 
 interface CategoryData {
-  fullTitle: string;
-  fullLink: string;
-  asin: string;
-  price: string;
-  lastPrice: number;
-  symbol: string;
-  image: string;
-  node: null;
+  fullTitle: string
+  fullLink: string
+  asin: string
+  price: string
+  lastPrice: number
+  symbol: string
+  image: string
+  node: null
 }
 
 interface PartialProductInfo {
-  fullTitle: string;
-  fullLink: string;
-  asin: string;
-  price: string;
-  lastPrice: number;
-  symbol: string;
-  image: string;
+  fullTitle: string
+  fullLink: string
+  asin: string
+  price: string
+  lastPrice: number
+  symbol: string
+  image: string
 }
 
 interface ProductInfo extends PartialProductInfo {
-  seller: string;
-  shipping: string;
-  rating: string;
-  features: string[];
-  availability: string;
+  seller: string
+  shipping: string
+  rating: string
+  features: string[]
+  availability: string
 }
 
 interface CategoryNode {
-  name: string;
-  id: number;
-  subCategories: CategoryNode[];
+  name: string
+  id: number
+  subCategories: CategoryNode[]
 }

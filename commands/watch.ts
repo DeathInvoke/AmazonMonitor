@@ -3,13 +3,16 @@ import {addWatchlistItem, getWatchlist} from '../common/watchlist.js'
 import {Client, Message} from 'discord.js'
 import {category, item, search} from '../common/amazon.js'
 import {parseArgs} from '../common/arguments.js'
+// @ts-ignore
+import {LinkItem} from '../global.js'
 
 const {cache_limit, tld, guild_item_limit}: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export default {
 	name: 'watch',
 	desc: 'Aggiungi e traccia dei prodotti Amazon',
-	usage: 'watch [argomenti (eg, -q per query, -c per categoria, -l per link)] [link amazon, link di una categoria, oppure query di ricerca] [opzionali: -p per limite di prezzo, -d per differenza di prezzo, -e per percentuale sconto]',
+	usage: 'watch [argomenti: -q per query | -c per categoria | -l per link)] [link amazon, link di una categoria, oppure query di ricerca]\n' +
+	  '[opzionali: -b (true|false) per attivare autobuy | -p per limite di prezzo | -d per differenza di prezzo | -e per percentuale sconto]',
 	type: 'edit',
 	run
 }
@@ -45,6 +48,11 @@ const argDef = {
 		aliases: ['d'],
 		type: 'number'
 	},
+	autobuy: {
+		name: 'autobuy',
+		aliases: ['b'],
+		type: 'boolean'
+	}
 }
 
 async function run(bot: Client, message: Message, args: string[]) {
@@ -91,7 +99,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 			return
 		}
 
-		addWatchlistItem({
+		const data: LinkItem = {
 			guildId: message.guildId,
 			channelId: message.channelId,
 			type: 'link',
@@ -101,8 +109,11 @@ async function run(bot: Client, message: Message, args: string[]) {
 			difference: processed.difference as number,
 			symbol: product.symbol,
 			itemName: product.fullTitle,
-			lastPrice: parseFloat(product.price)
-		})
+			lastPrice: parseFloat(product.price),
+			autobuy: processed.autobuy
+		}
+
+		await addWatchlistItem(data)
 
 		response = `Prodotto aggiunto con successo: ${processed.link}`
 
@@ -186,7 +197,13 @@ async function run(bot: Client, message: Message, args: string[]) {
 	}
 
 	// Add the extras for price difference, price percentage, and price limit
-	const currency = `${processed.symbol || '$'}`
+	let symbol = ''
+	if(processed.symbol && processed.symbol != ''){
+		symbol = processed.symbol
+	}else{
+		symbol = '$'
+	}
+	const currency = `${symbol}`
 	if (processed.priceLimit) {
 		// @ts-ignore we null check this
 		response += `\nIl prezzo deve essere inferiore a ${currency}${processed.priceLimit}`
@@ -199,6 +216,10 @@ async function run(bot: Client, message: Message, args: string[]) {
 	if (processed.difference) {
 		// @ts-ignore we null check this
 		response += `\nIl prezzo deve essere più di ${currency}${processed.difference} in meno rispetto al prezzo precedentemente rilevato`
+	}
+
+	if (processed.autobuy){
+		response += '\nPer questo prodotto è stata attivata la funzione di autobuy'
 	}
 
 	message.channel.send({tts: false, content: response})

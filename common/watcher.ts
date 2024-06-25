@@ -4,7 +4,8 @@ import fs from 'fs'
 import { addWatchlistItem, getWatchlist, removeWatchlistItem } from './watchlist.js'
 import debug from './debug.js'
 import { item, category, search } from './amazon.js'
-import { sendNotifications } from './notifications.js'
+import {sendNotifications, sendPerformedAutobuy} from './notifications.js'
+import {autobuy} from './buyer.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -35,7 +36,7 @@ export async function doCheck(bot: Client, i: number) {
   switch (item.type) {
     case 'link':
       // @ts-ignore we are properly checking the type
-      result = await itemCheck(item)
+      result = await itemCheck(item, bot)
       break
     case 'category':
       // @ts-ignore we are properly checking the type
@@ -59,8 +60,9 @@ export async function doCheck(bot: Client, i: number) {
   }
 }
 
-async function itemCheck(product: LinkItem) {
+async function itemCheck(product: LinkItem, bot: Client) {
   const newData = await item(product.link)
+  const mustBuy: boolean = product.autobuy
   debug.log(`new price arrived => ${newData?.price}`, 'debug')
   // It's possible the item does not have a price, so we gotta anticipate that
   const newPrice = parseFloat(newData?.price) || -1
@@ -83,9 +85,7 @@ async function itemCheck(product: LinkItem) {
   debug.log(`Vecchio prezzo: ${product.lastPrice}...`, 'debug')
 
   if (newPrice !== -1 && underPriceLimit && product.lastPrice > newPrice) {
-    debug.log('Sending notification...', 'debug')
-
-    return [
+    let notifData = [
       {
         itemName: newData?.fullTitle || 'N/A',
         oldPrice: product.lastPrice,
@@ -101,8 +101,18 @@ async function itemCheck(product: LinkItem) {
         coupon: 0
       }
     ] as NotificationData[]
-  }
 
+
+    debug.log('Sending notification...', 'debug')
+    if(mustBuy){
+      debug.log(`Calling autobuy function for ${product.itemName}`, 'debug')
+      const success: boolean = await autobuy(product.link)
+      if(success){
+        await sendPerformedAutobuy(bot, notifData)
+      }
+    }
+    return notifData
+  }
   return null
 }
 

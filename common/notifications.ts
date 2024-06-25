@@ -7,8 +7,8 @@ import {NotificationData} from '../global.js'
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 const tld: string = config.tld
 
+const channels = config.notification_channels
 export async function sendNotifications(bot: Client, notifications: NotificationData[]) {
-  const channels = config.notification_channels
 
   for (const notif of notifications) {
     // If we have url_params, add them to the URL
@@ -61,6 +61,19 @@ export async function sendPriceChange(bot: Client, notification: NotificationDat
     .setColor('Green')
 
   await sendToNotifyChannel(bot, notification, embed, channel)
+}
+
+export async function sendPerformedAutobuy(bot: Client, notification: NotificationData){
+  const embed = new EmbedBuilder()
+    .setTitle(`Autobuy concluso con successo "${notification.itemName}"`)
+    .setAuthor({
+      name: 'AmazonMonitor'
+    })
+    .setThumbnail(notification.image)
+    .setDescription(`Acquistato al prezzo di: ${notification.symbol}${notification.newPrice.toFixed(2)}\n\nControlla l'account Amazon per validare l'ordine!\n\n${notification.link}`)
+    .setColor('Green')
+
+  await sendToNotifyChannel(bot, notification, embed, channels.get('autobuy'))
 }
 
 // ------------------------------------------------------------

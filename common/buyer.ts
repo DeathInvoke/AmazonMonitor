@@ -1,6 +1,6 @@
 import {getPupPage} from './browser.js'
 import pup from 'puppeteer'
-import {is} from 'cheerio/lib/api/traversing.js'
+import debug from './debug.js'
 
 
 export async function autobuy(link: string) {
@@ -11,25 +11,35 @@ export async function autobuy(link: string) {
 	// const order_complete_selector: string = '#widget-purchaseConfirmationStatus'
 
 	const page = await getPupPage(link)
-	await _clickOnElement(page, buy_now_selector);
-	await page.waitForNavigation()
-	await _sleep(500)
-
-	await _clickOnElement(page, submit_btn_selector)
-	await page.waitForNavigation()
-	await _sleep(500)
-
-	const isDouble = await _checkIfElementExists(page, force_double_order_selector_name)
-	if(isDouble){
-		await _clickOnElement(page, force_double_order_selector_name)
+	try{
+		await _clickOnElement(page, buy_now_selector);
 		await page.waitForNavigation()
 		await _sleep(500)
+
+		await _clickOnElement(page, submit_btn_selector)
+		await page.waitForNavigation()
+		await _sleep(500)
+
+		const isDouble = await _checkIfElementExists(page, force_double_order_selector_name)
+		if(isDouble){
+			await _clickOnElement(page, force_double_order_selector_name)
+			await page.waitForNavigation()
+			await _sleep(500)
+		}
+
+		await _clickOnElement(page, save_order_selector)
+		await page.waitForNavigation()
+		await _sleep(500)
+
+		return true;
+	}catch (error){
+		debug.log(`Error while autobuy product ${link}`, 'error')
+		return false;
+	}finally {
+		await page.close()
 	}
 
-	await _clickOnElement(page, save_order_selector)
-	await page.waitForNavigation()
-	await _sleep(500)
-	await page.close()
+
 
 }
 
