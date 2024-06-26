@@ -84,7 +84,7 @@ async function itemCheck(product: LinkItem, bot: Client) {
   debug.log(`Nuovo prezzo: ${newPrice}...`, 'debug')
   debug.log(`Vecchio prezzo: ${product.lastPrice}...`, 'debug')
 
-  if (newPrice !== -1 && underPriceLimit && product.lastPrice > newPrice) {
+  if (newPrice !== -1 && underPriceLimit && (product.lastPrice !== -1 && product.lastPrice > newPrice)) {
     let notifData = [
       {
         itemName: newData?.fullTitle || 'N/A',
