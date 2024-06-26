@@ -298,7 +298,8 @@ export async function login() {
 	  },
 	  email)
 
-	await delay(1000) /// waiting 1 second.
+	//await delay(1000) /// waiting 1 second.
+	await page.waitForSelector('#continue')
 	await page.click('#continue')
 	await page.waitForSelector('#ap_password')
 
@@ -306,9 +307,10 @@ export async function login() {
 	  (el, psw) => {
 		  el.value = psw
 	  }, psw)
-	await delay(1000)
+	//await delay(1000)
+	await page.waitForSelector('#signInSubmit')
 	await page.click('#signInSubmit')
-	await page.waitForNavigation()
+	await page.waitForNavigation({waitUntil: 'domcontentloaded'})
 
 	const cookies = JSON.stringify(await page.cookies())
 

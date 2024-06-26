@@ -16,7 +16,7 @@ export async function initBrowser() {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
   globalThis.browser = await pup.launch({
     // @ts-ignore
-    headless: true,//'new',
+    headless: false,//'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     ...(config.custom_chromium_exec && {executablePath: config.custom_chromium_exec})
   })
@@ -95,10 +95,10 @@ export async function getPage(url: string) {
   await page.setUserAgent(uAgent)
   await page.goto(url, { waitUntil: 'domcontentloaded' })
   await loadCookies(page)
-  await page.reload()
+  //await page.reload()
   debug.log('Waiting a couple seconds for JavaScript to load...', 'info')
 
-  await new Promise(r => setTimeout(r, 1500))
+  //await new Promise(r => setTimeout(r, 1500))
 
   // Just in ase there are misleading redirects, make sure we click the right "dimension-value" button
   const useImgSwatch = (await page.$$('.dimension-values-list')).length === 0 && (await page.$$('.imageSwatches')).length > 0
@@ -127,13 +127,14 @@ export async function getPage(url: string) {
         await dimensionValue.click()
 
         // Wait a couple seconds to let the new page load
-        await new Promise(r => setTimeout(r, 1500))
+        await new Promise(r => setTimeout(r, 1000))
         break
       }
     }
   }
 
   const html = await page.evaluate(() => document.body.innerHTML).catch(e => debug.log(e, 'error'))
+  //const html = await page.$eval('', () => {return document.body.innerHTML}).catch(e => debug.log(e, 'error'))
 
   // No need for page to continue to exist
   await page.close()
@@ -143,7 +144,7 @@ export async function getPage(url: string) {
     return null
   }
 
-  const $ = await load(html)
+  const $ = load(html)
 
   debug.log(`Page took ${new Date().getTime() - now}ms to load.`, 'info')
 
