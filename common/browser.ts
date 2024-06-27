@@ -80,7 +80,7 @@ export async function getPage(url: string) {
 
   if (proxy) {
     debug.log('Selected proxy URL: ' + proxy, 'info')
-    page.setRequestInterception(true)
+    await page.setRequestInterception(true)
 
     page.on('request', async (req) => {
       if (!proxy?.startsWith('http')) proxy = 'https://' + proxy
@@ -100,8 +100,11 @@ export async function getPage(url: string) {
 
   //await new Promise(r => setTimeout(r, 1500))
 
-  // Just in ase there are misleading redirects, make sure we click the right "dimension-value" button
-  const useImgSwatch = (await page.$$('.dimension-values-list')).length === 0 && (await page.$$('.imageSwatches')).length > 0
+  // Just in case there are misleading redirects, make sure we click the right "dimension-value" button
+  const areDimensionValues: boolean = (await page.$$('.dimension-values-list')).length !== 0
+  const areImgSwatches: boolean = (await page.$$('.imageSwatches')).length > 0
+
+  const useImgSwatch = areDimensionValues && areImgSwatches
   const maybeDimensionValues = useImgSwatch ? await page.$$('.imageSwatches') : await page.$$('.dimension-values-list')
 
   debug.log('Do we have dimension values? ' + String(maybeDimensionValues.length > 0), 'debug')
@@ -165,7 +168,7 @@ export async function getPupPage(url: string){
   await page.setUserAgent(uAgent)
   await page.goto(url, { waitUntil: 'domcontentloaded' })
   await loadCookies(page)
-  await page.reload()
+  //await page.reload()
   debug.log('Waiting a couple seconds for JavaScript to load...', 'info')
 
   return page

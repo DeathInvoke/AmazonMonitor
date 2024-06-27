@@ -150,22 +150,43 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 	debug.log('Detected as a regular item', 'debug')
 
 	let couponDiscount = 0
+	let isCouponPercentage: boolean = false
 
 	// Get the coupon price, if it exists
 	if ($('label[id*="couponTextpctch"]').text().trim() !== '') {
 		couponDiscount = parseInt($('label[id*="couponTextpctch"]').text().trim().match(/(\d+)/)[0], 10) || 0
+		isCouponPercentage = $('label[id*="couponTextpctch"]').text().includes('%')
 	}
+	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	// Price block finder
+	const priceBlockOurPrice: string = $('#priceblock_ourprice').text().trim()
+	const priceBlockSalePrice: string = $('#priceblock_saleprice').text().trim()
+	const snsBasePrice: string = $('#sns-base-price').find('.a-price').find('.a-offscreen').eq(0).text().trim()
+	const aPriceStr: string = $('#corePriceDisplay_desktop_feature_div').find('.a-price').find('.a-offscreen').eq(0).text().trim()
+	let aPrice: number = parseFloat(priceFormat(aPriceStr))
+
+	const priceWholeFractionStr: string = $('#corePriceDisplay_desktop_feature_div').find('.a-price-whole').first().text().trim() + $('#corePriceDisplay_desktop_feature_div').find('.a-price-fraction').first().text().trim()
+	let priceWholeFraction: number = parseFloat(priceFormat(priceWholeFractionStr))
+	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
+	// Applying coupon discount
+	if (isCouponPercentage) {
+		aPrice -= (aPrice / 100) * couponDiscount
+		priceWholeFraction -= (priceWholeFraction / 100) * couponDiscount
+	} else {
+		aPrice -= couponDiscount
+		priceWholeFraction -= couponDiscount
+	}
+	// -----------------------------------------------------------------------------
+	// -----------------------------------------------------------------------------
 
 	const priceElms = [
-		$('#priceblock_ourprice').text().trim(),
-		$('#priceblock_saleprice').text().trim(),
-		$('#sns-base-price').text().trim(),
-		String(
-		  parseFloat(priceFormat($('#corePriceDisplay_desktop_feature_div').find('.a-price').find('.a-offscreen').eq(0).text().trim())) - couponDiscount
-		),
-		String(
-		  parseFloat(priceFormat($('#corePriceDisplay_desktop_feature_div').find('.a-price-whole').first().text().trim() + $('#corePriceDisplay_desktop_feature_div').find('.a-price-fraction').first().text().trim())) - couponDiscount
-		),
+		priceBlockOurPrice,
+		priceBlockSalePrice,
+		snsBasePrice,
+		String(aPrice),
+		String(priceWholeFraction),
 	]
 
 	const shippingElms = [
@@ -218,7 +239,10 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 		}
 	})
 
-	if (priceElms[2].replace(/[,.]+/g, '').replace(/\d/g, '')) product.symbol = priceElms[2].replace(/[,.]+/g, '').replace(/\d/g, '')
+	const parsedSymbol: string = priceElms[2].replace(/[\d,.]/g, '')?.at(0)
+	if (parsedSymbol) {
+		product.symbol = parsedSymbol
+	}
 
 	// Scan all shipping elements and get whichever actually exist
 	const sellers = $('.pa_mbc_on_amazon_offer').toArray()

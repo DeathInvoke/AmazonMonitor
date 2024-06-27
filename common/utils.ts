@@ -1,5 +1,5 @@
 export function linkToAsin(link: string) {
-  return link?.split('/dp/')[1]?.split('/')[0]?.replace(/\?/g, '') || link.split('/gp/product/')[1]?.split('/')[0]?.replace(/\?/g, '')
+  return link?.split('/dp/')[1]?.split("?")[0] || link.split('/gp/product/')[1]?.split("?")[0]
 }
 
 export function trim(str: string, toLength: number = 128) {

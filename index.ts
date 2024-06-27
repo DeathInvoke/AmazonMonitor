@@ -7,7 +7,6 @@ import {startWatcher} from './common/watcher.js'
 import {getCategoryTree} from './common/categories.js'
 import {startServer} from './api.js'
 import {login} from './common/amazon.js'
-import {autobuy} from './common/buyer.js'
 
 declare global {
 	var browser: import('puppeteer').Browser
@@ -40,7 +39,7 @@ if (config.dev) {
 }
 // ----------------------------------
 
-bot.login(token)
+await bot.login(token)
 
 bot.on('ready', async () => {
 	console.log(`

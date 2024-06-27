@@ -63,6 +63,7 @@ export async function doCheck(bot: Client, i: number) {
 async function itemCheck(product: LinkItem, bot: Client) {
   const newData = await item(product.link)
   const mustBuy: boolean = product.autobuy
+
   debug.log(`new price arrived => ${newData?.price}`, 'debug')
   // It's possible the item does not have a price, so we gotta anticipate that
   const newPrice = parseFloat(newData?.price) || -1
