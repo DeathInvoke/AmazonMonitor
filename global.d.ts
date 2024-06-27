@@ -45,7 +45,7 @@ interface Command {
 
 interface NotificationData {
   itemName: string
-  coupon: number
+  coupon: boolean
   oldPrice: number
   newPrice: number
   symbol: string
@@ -91,7 +91,7 @@ type Watchlist = Array<LinkItem | CategoryItem | QueryItem>
 interface SearchData {
   fullTitle: string
   ratings: string
-  coupon: number
+  coupon: boolean
   price: string
   lastPrice: number
   symbol: string

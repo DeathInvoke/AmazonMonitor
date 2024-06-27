@@ -99,7 +99,7 @@ async function itemCheck(product: LinkItem, bot: Client) {
         difference: product.difference || null,
         symbol: newData?.symbol,
         image: newData?.image,
-        coupon: 0
+        coupon: newData?.hasCoupon
       }
     ] as NotificationData[]
 
@@ -152,7 +152,7 @@ async function categoryCheck(cat: CategoryItem) {
         difference: cat.difference || null,
         symbol: item.symbol,
         image: item?.image,
-        coupon: 0,
+        coupon: false,
       })
     }
   })
@@ -188,17 +188,17 @@ async function queryCheck(query: QueryItem) {
     if (matchingObj.lastPrice === item.lastPrice) return
 
     // if the obj has a coupon, modify the lastprice to reflect that
-    if (matchingObj?.coupon > 0) {
+    /*if (matchingObj?.coupon > 0) {
       matchingObj.lastPrice -= matchingObj.coupon
-    }
+    }*/
 
-    const newPriceWithCoupon = item.coupon > 0 ? item.lastPrice - item.coupon : item.lastPrice
+    //const newPriceWithCoupon = item.coupon > 0 ? item.lastPrice - item.coupon : item.lastPrice
 
-    if (newPriceWithCoupon < matchingObj.lastPrice) {
+    if (item.lastPrice < matchingObj.lastPrice) {
       notifications.push({
         itemName: item.fullTitle,
         oldPrice: matchingObj.lastPrice,
-        newPrice: newPriceWithCoupon,
+        newPrice: item.lastPrice,
         link: item.fullLink,
         guildId: query.guildId,
         channelId: query.channelId,

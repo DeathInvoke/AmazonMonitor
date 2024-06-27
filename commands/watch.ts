@@ -197,7 +197,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 	}
 
 	// Add the extras for price difference, price percentage, and price limit
-	let symbol = ''
+	let symbol: string | number = ''
 	if(processed.symbol && processed.symbol != ''){
 		symbol = processed.symbol
 	}else{
