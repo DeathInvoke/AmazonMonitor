@@ -42,7 +42,9 @@ export function parseArgs(args: string[], defs: Definitions): ParsedArguments {
       }
 
       const value = parseVal(args[i + 1], argDef.type)
-
+      if(argName === 'pz' && value === 0){
+        throw new Error('Pieces to buy cannot be 0.')
+      }
       // Get the full name of an alias if it is one, or just use the full name
       parsedArgs[argDef.name] = value
 

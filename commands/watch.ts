@@ -52,6 +52,11 @@ const argDef = {
 		name: 'autobuy',
 		aliases: ['b'],
 		type: 'boolean'
+	},
+	piecesToBuy: {
+		name: 'piecesToBuy',
+		aliases: ['pz'],
+		type: 'number'
 	}
 }
 
@@ -99,6 +104,8 @@ async function run(bot: Client, message: Message, args: string[]) {
 			return
 		}
 
+		const piecesToBuy = processed.piecesToBuy as number
+
 		const data: LinkItem = {
 			guildId: message.guildId,
 			channelId: message.channelId,
@@ -110,12 +117,18 @@ async function run(bot: Client, message: Message, args: string[]) {
 			symbol: product.symbol,
 			itemName: product.fullTitle,
 			lastPrice: parseFloat(product.price),
-			autobuy: processed.autobuy
+			autobuy: processed.autobuy,
+			bought: 0,
+			piecesToBuy: piecesToBuy
 		}
 
 		await addWatchlistItem(data)
 
 		response = `Prodotto aggiunto con successo: ${processed.link}`
+
+		if(piecesToBuy){
+			response += `\nIl numero di pezzi da acquistare è: ${piecesToBuy}`
+		}
 
 		break
 	}

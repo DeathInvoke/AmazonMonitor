@@ -1,4 +1,6 @@
 import fs from 'fs'
+// @ts-ignore
+import {LinkItem} from '../global.js'
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 const tld: string = config.tld
 const watchFile = `./watchlist_${tld}.json`
@@ -44,6 +46,18 @@ export const removeWatchlistItem = async (url: string) => {
   if (item) watchlist.splice(watchlist.indexOf(item), 1)
 
   fs.writeFileSync(watchFile, JSON.stringify(watchlist), 'utf-8')
+}
+
+export function retrieveWatchListItem(url: string): LinkItem | CategoryItem | QueryItem {
+  const watchlist: Watchlist = JSON.parse(fs.readFileSync(watchFile).toString())
+  const item = watchlist.find(x => {
+    // @ts-ignore TS stupid
+    if (x.type === 'link') return x.link === url
+    // @ts-ignore
+    if (x.type === 'query') return x.query === url
+  })
+
+  return item
 }
 
 /**

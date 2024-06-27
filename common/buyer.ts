@@ -7,7 +7,6 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 	const submit_btn_selector: string = '#submitOrderButtonId'
 	const save_order_selector: string = 'a[class="a-button-text"]'
 	const force_double_order_selector_name: string = '[name="forcePlaceOrder"]'
-	// const order_complete_selector: string = '#widget-purchaseConfirmationStatus'
 
 	const page = await getPupPage(link)
 	try {
@@ -17,6 +16,17 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 			await _sleep(500)
 		}
 		await _clickOnElement(page, buy_now_selector)
+
+		const isThereSubmit = await _checkIfElementExists(page, submit_btn_selector)
+		if(!isThereSubmit){
+			const message = await page.$eval('h4[class=".a-color-error"]', el => {
+				return el.textContent
+			})
+			if(message && message !== ''){
+				throw new Error(message)
+			}
+		}
+
 		await page.waitForSelector(submit_btn_selector)
 		await _sleep(500)
 
@@ -31,13 +41,8 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 		}
 
 		await _sleep(5000)
-		/*await page.$$eval('a', (el) => {
-			console.log("Finding save order...")
-			const btn_save = el.find(value => value.className === 'a-button-text')
-			if(btn_save)
-				btn_save.click()
-		}, save_order_selector)*/
 		await page.waitForSelector(save_order_selector, {timeout: 5000})
+
 		await _clickOnElement(page, save_order_selector)
 		await page.waitForNavigation()
 		await _sleep(500)

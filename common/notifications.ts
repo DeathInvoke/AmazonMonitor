@@ -78,14 +78,13 @@ export async function sendPriceChange(bot: Client, notification: NotificationDat
 export async function sendPerformedAutobuy(bot: Client, notification: NotificationData[]) {
   if(notification.length > 0) {
     const notif = notification[0]
-
     const embed = new EmbedBuilder()
       .setTitle(`Autobuy concluso con successo "${notif.itemName}"`)
       .setAuthor({
         name: 'AmazonMonitor'
       })
       .setThumbnail(notif.image)
-      .setDescription(`Acquistato al prezzo di: ${notif.symbol}${notif.newPrice.toFixed(2)}\n\nControlla l'account Amazon per validare l'ordine!\n\n${notif.link}`)
+      .setDescription(`Acquistato al prezzo di: ${notif.symbol}${notif.newPrice.toFixed(2)}\n\nControlla l'account Amazon per validare l'ordine!\n\n${notif.link}\n\n`)
       .setColor('Green')
 
     // @ts-ignore

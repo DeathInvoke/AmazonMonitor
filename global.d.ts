@@ -79,6 +79,8 @@ interface LinkItem extends PartialWatchlistItem {
   lastPrice: number
   itemName: string
   autobuy: boolean // Inserted in LinkItem only... in future will be possible to autobuy categories and queries, maybe (?)
+  bought: number // How many times an item has been bought
+  piecesToBuy: number // How many pieces to buy
 }
 
 interface CategoryItem extends PartialWatchlistItem {
