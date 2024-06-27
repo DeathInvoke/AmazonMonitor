@@ -3,6 +3,8 @@ import {CheerioAPI} from 'cheerio'
 import {getPage} from './browser.js'
 import debug from './debug.js'
 import {linkToAsin, parseParams, priceFormat} from './utils.js'
+// @ts-ignore
+import {CouponInfo} from '../global.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -31,6 +33,11 @@ export async function search(query: string, suffix: string) {
 		const maybeCoupon = priceFormat($(this).find('.s-coupon-unclipped span').first().text().trim().replace(/[a-zA-Z]/g, ''))
 		const isPct = $(this).find('.s-coupon-unclipped span').first().text().trim().includes('%')
 
+		let couponInfo: CouponInfo = {
+			hasCoupon: !maybeCoupon.includes('NaN'),
+			isPercentage: isPct,
+			couponAbsoluteValue: parseFloat(maybeCoupon)
+		}
 		// prevent duplicates
 		if (foundAsins.includes(asin)) return
 		foundAsins.push(asin)
@@ -38,7 +45,7 @@ export async function search(query: string, suffix: string) {
 		results.push({
 			fullTitle: $(this).find('span.a-text-normal').text().trim(),
 			ratings: $(this).find('.a-icon-alt').text().trim(),
-			coupon: isPct ? parseFloat(price) * (parseFloat(maybeCoupon) / 100) : maybeCoupon.includes('NaN') ? 0 : parseFloat(maybeCoupon),
+			coupon: couponInfo,
 			price: price.includes('NaN') ? '' : price,
 			lastPrice: parseFloat(price) || 0,
 			symbol: priceString.replace(/[,.]+/g, '').replace(/[\d a-zA-Z]/g, ''),
@@ -174,6 +181,11 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 	}
 	// -----------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------
+	const couponInfo: CouponInfo = {
+		hasCoupon: hasCoupon,
+		couponAbsoluteValue: couponDiscount,
+		isPercentage: isCouponPercentage
+	}
 
 	const priceElms = [
 		String(fullPrice)
@@ -207,7 +219,7 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 		features: parsedFeatures,
 		availability: $('#availability').first().find('span').text().trim(),
 		image: $('#landingImage').attr('data-old-hires') || 'https://via.placeholder.com/300x300.png?text=No+Image',
-		hasCoupon: hasCoupon
+		coupon: couponInfo
 	}
 
 	// Get other offer prices
@@ -285,7 +297,7 @@ async function parseBook($: CheerioAPI, url: string): Promise<ProductInfo> {
 		features: optionsArray,
 		availability: $('#buybox').find('.a-text-center').find('a').first().text().trim(),
 		image: $('#imgBlkFront').attr('src') || 'https://via.placeholder.com/300x300.png?text=No+Image',
-		hasCoupon: false //TODO jus a placeholder.. it has to be checked
+		coupon: null
 	}
 
 	return book

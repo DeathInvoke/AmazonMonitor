@@ -6,6 +6,8 @@ import debug from './debug.js'
 import { item, category, search } from './amazon.js'
 import {sendNotifications, sendPerformedAutobuy} from './notifications.js'
 import {autobuy} from './buyer.js'
+// @ts-ignore
+import {LinkItem} from '../global.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -21,7 +23,7 @@ export async function startWatcher(bot: Client) {
 
     debug.log('Controllo prezzi...')
 
-    if (rows.length > 0) doCheck(bot, 0)
+    if (rows.length > 0) await doCheck(bot, 0)
   }, config.minutes_per_check * 60 * 1000)
 }
 
@@ -63,9 +65,10 @@ export async function doCheck(bot: Client, i: number) {
 async function itemCheck(product: LinkItem, bot: Client) {
   const newData = await item(product.link)
   const mustBuy: boolean = product.autobuy
+  const hasCoupon = newData?.coupon.hasCoupon
 
   debug.log(`new price arrived => ${newData?.price}`, 'debug')
-  // It's possible the item does not have a price, so we gotta anticipate that
+  // It's possible the item does not have a price, so we have to anticipate that
   const newPrice = parseFloat(newData?.price) || -1
   //const newPrice = parseFloat(newData?.price?.replace(/,/g, '')) || -1
 
@@ -99,7 +102,7 @@ async function itemCheck(product: LinkItem, bot: Client) {
         difference: product.difference || null,
         symbol: newData?.symbol,
         image: newData?.image,
-        coupon: newData?.hasCoupon
+        coupon: newData?.coupon
       }
     ] as NotificationData[]
 
@@ -107,7 +110,7 @@ async function itemCheck(product: LinkItem, bot: Client) {
     debug.log('Sending notification...', 'debug')
     if(mustBuy){
       debug.log(`Calling autobuy function for ${product.itemName}`, 'debug')
-      const success: boolean = await autobuy(product.link)
+      const success: boolean = await autobuy(product.link, hasCoupon)
       if(success){
         await sendPerformedAutobuy(bot, notifData)
       }
@@ -152,7 +155,7 @@ async function categoryCheck(cat: CategoryItem) {
         difference: cat.difference || null,
         symbol: item.symbol,
         image: item?.image,
-        coupon: false,
+        coupon: null,
       })
     }
   })

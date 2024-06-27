@@ -1,5 +1,5 @@
 interface ParsedArguments {
-  [key: string]: string | number;
+  [key: string]: string | number | boolean;
 }
 
 interface ArgumentDefinition {

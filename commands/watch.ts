@@ -199,7 +199,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 	// Add the extras for price difference, price percentage, and price limit
 	let symbol: string | number = ''
 	if(processed.symbol && processed.symbol != ''){
-		symbol = processed.symbol
+		symbol = processed.symbol as string
 	}else{
 		symbol = '$'
 	}
@@ -218,7 +218,8 @@ async function run(bot: Client, message: Message, args: string[]) {
 		response += `\nIl prezzo deve essere più di ${currency}${processed.difference} in meno rispetto al prezzo precedentemente rilevato`
 	}
 
-	if (processed.autobuy){
+	const autobuy: boolean = processed.autobuy as boolean
+	if (autobuy){
 		response += '\nPer questo prodotto è stata attivata la funzione di autobuy'
 	}
 

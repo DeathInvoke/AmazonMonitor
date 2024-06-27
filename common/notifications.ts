@@ -55,14 +55,20 @@ export async function sendInStock(bot: Client, notification: NotificationData, c
 }
 
 export async function sendPriceChange(bot: Client, notification: NotificationData, channel: string) {
+	const symbol = notification.symbol
+	const oldPrice = priceFormat(notification.oldPrice)
+	const newPrice = notification.newPrice.toFixed(2)
+	const couponInfo = notification.coupon
+	let couponAlert = 'con un coupon ' + couponInfo.isPercentage ? `del ${couponInfo.couponAbsoluteValue} %` : `di ${symbol}${couponInfo.couponAbsoluteValue}`
+
 	const embed = new EmbedBuilder()
 	  .setTitle(`Notifica cambio di prezzo per "${notification.itemName}"`)
 	  .setAuthor({
 		  name: 'AmazonMonitor'
 	  })
 	  .setThumbnail(notification.image)
-	  .setDescription(`Prezzo precedente: ${notification.symbol}${priceFormat(notification.oldPrice)}\nNuovo prezzo: ${notification.symbol}${notification.newPrice.toFixed(2) + (
-		notification.coupon > 0 ? ` (${notification.symbol}${notification.coupon.toFixed(2)} off with coupon)` : ''
+	  .setDescription(`Prezzo precedente: ${symbol}${oldPrice}\nNuovo prezzo: ${symbol}${newPrice + (
+		couponInfo.hasCoupon ? couponAlert : ''
 	  )}\n\n${notification.link}`)
 	  .setColor('Green')
 

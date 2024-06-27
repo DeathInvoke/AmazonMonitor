@@ -43,9 +43,15 @@ interface Command {
   run: (bot: import('discord.js').Client, message: import('discord.js').Message, args: string[]) => Promise<void>
 }
 
+interface CouponInfo{
+  hasCoupon: boolean
+  couponAbsoluteValue: number
+  isPercentage: boolean
+}
+
 interface NotificationData {
   itemName: string
-  coupon: boolean
+  coupon: CouponInfo
   oldPrice: number
   newPrice: number
   symbol: string
@@ -91,7 +97,7 @@ type Watchlist = Array<LinkItem | CategoryItem | QueryItem>
 interface SearchData {
   fullTitle: string
   ratings: string
-  coupon: boolean
+  coupon: CouponInfo
   price: string
   lastPrice: number
   symbol: string
@@ -127,7 +133,7 @@ interface PartialProductInfo {
   lastPrice: number
   symbol: string
   image: string
-  hasCoupon: boolean
+  coupon: CouponInfo
 }
 
 interface ProductInfo extends PartialProductInfo {

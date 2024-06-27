@@ -16,7 +16,7 @@ export async function initBrowser() {
   const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
   globalThis.browser = await pup.launch({
     // @ts-ignore
-    headless: true,//'new',
+    headless: false,//'new',
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
     ...(config.custom_chromium_exec && {executablePath: config.custom_chromium_exec})
   })
