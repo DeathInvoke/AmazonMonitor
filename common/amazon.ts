@@ -151,42 +151,32 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 
 	let couponDiscount = 0
 	let isCouponPercentage: boolean = false
-
+	const hasCoupon: boolean = $('label[id*="couponTextpctch"]').text().trim() !== ''
 	// Get the coupon price, if it exists
-	if ($('label[id*="couponTextpctch"]').text().trim() !== '') {
+	if (hasCoupon) {
 		couponDiscount = parseInt($('label[id*="couponTextpctch"]').text().trim().match(/(\d+)/)[0], 10) || 0
 		isCouponPercentage = $('label[id*="couponTextpctch"]').text().includes('%')
 	}
 	// -----------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------
 	// Price block finder
-	const priceBlockOurPrice: string = $('#priceblock_ourprice').text().trim()
-	const priceBlockSalePrice: string = $('#priceblock_saleprice').text().trim()
-	const snsBasePrice: string = $('#sns-base-price').find('.a-price').find('.a-offscreen').eq(0).text().trim()
-	const aPriceStr: string = $('#corePriceDisplay_desktop_feature_div').find('.a-price').find('.a-offscreen').eq(0).text().trim()
-	let aPrice: number = parseFloat(priceFormat(aPriceStr))
-
-	const priceWholeFractionStr: string = $('#corePriceDisplay_desktop_feature_div').find('.a-price-whole').first().text().trim() + $('#corePriceDisplay_desktop_feature_div').find('.a-price-fraction').first().text().trim()
-	let priceWholeFraction: number = parseFloat(priceFormat(priceWholeFractionStr))
+	const priceDiv = $('#corePriceDisplay_desktop_feature_div')
+	const symbol = priceDiv.find('.a-price-symbol').first().text().trim()
+	const fullPriceStr: string = priceDiv.find('.a-price-whole').first().text().trim() + priceDiv.find('.a-price-fraction').first().text().trim()
+	let fullPrice: number = parseFloat(priceFormat(fullPriceStr))
 	// -----------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------
 	// Applying coupon discount
 	if (isCouponPercentage) {
-		aPrice -= (aPrice / 100) * couponDiscount
-		priceWholeFraction -= (priceWholeFraction / 100) * couponDiscount
+		fullPrice -= (fullPrice / 100) * couponDiscount
 	} else {
-		aPrice -= couponDiscount
-		priceWholeFraction -= couponDiscount
+		fullPrice -= couponDiscount
 	}
 	// -----------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------
 
 	const priceElms = [
-		priceBlockOurPrice,
-		priceBlockSalePrice,
-		snsBasePrice,
-		String(aPrice),
-		String(priceWholeFraction),
+		String(fullPrice)
 	]
 
 	const shippingElms = [
@@ -211,12 +201,13 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 		seller: $('#bylineInfo').text().trim(),
 		price: '',
 		lastPrice: 0,
-		symbol: '',
+		symbol: symbol,
 		shipping: '',
 		rating: $('.a-icon-star').find('.a-icon-alt').first().text().trim(),
 		features: parsedFeatures,
 		availability: $('#availability').first().find('span').text().trim(),
-		image: $('#landingImage').attr('data-old-hires') || 'https://via.placeholder.com/300x300.png?text=No+Image'
+		image: $('#landingImage').attr('data-old-hires') || 'https://via.placeholder.com/300x300.png?text=No+Image',
+		hasCoupon: hasCoupon
 	}
 
 	// Get other offer prices
@@ -235,14 +226,8 @@ async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 		if (!currentPrice || flt < currentPrice) {
 			product.price = flt.toFixed(2)
 			product.lastPrice = flt
-			product.symbol = p.replace(/[,.]+/g, '').replace(/[\d a-zA-Z]/g, '')
 		}
 	})
-
-	const parsedSymbol: string = priceElms[2].replace(/[\d,.]/g, '')?.at(0)
-	if (parsedSymbol) {
-		product.symbol = parsedSymbol
-	}
 
 	// Scan all shipping elements and get whichever actually exist
 	const sellers = $('.pa_mbc_on_amazon_offer').toArray()
@@ -299,7 +284,8 @@ async function parseBook($: CheerioAPI, url: string): Promise<ProductInfo> {
 		rating: $('.a-icon-star').find('.a-icon-alt').first().text().trim(),
 		features: optionsArray,
 		availability: $('#buybox').find('.a-text-center').find('a').first().text().trim(),
-		image: $('#imgBlkFront').attr('src') || 'https://via.placeholder.com/300x300.png?text=No+Image'
+		image: $('#imgBlkFront').attr('src') || 'https://via.placeholder.com/300x300.png?text=No+Image',
+		hasCoupon: false //TODO jus a placeholder.. it has to be checked
 	}
 
 	return book

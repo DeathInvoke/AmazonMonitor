@@ -127,6 +127,7 @@ interface PartialProductInfo {
   lastPrice: number
   symbol: string
   image: string
+  hasCoupon: boolean
 }
 
 interface ProductInfo extends PartialProductInfo {
