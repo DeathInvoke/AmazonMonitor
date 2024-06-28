@@ -1,18 +1,54 @@
 [
     {
-       "Biscotti spicchi di sole": "https://www.amazon.it/dp/B072BMFMNN"
+       "Biscotti spicchi di sole": "https://www.amazon.it/dp/B072BMFMNN",
+        "b": true,
+        "p": 2,
+        "pz": 1
     },
     {
-        "Foxy": "https://www.amazon.it/dp/B086PMZKKJ"
+        "Foxy": "https://www.amazon.it/dp/B086PMZKKJ",
+        "b": true,
+        "p": 4,
+        "pz": 3
     },
     {
-        "Antela lampadine smart": "https://www.amazon.it/dp/B08R8PP7Q9"
+        "Antela lampadine smart": "https://www.amazon.it/dp/B08R8PP7Q9",
+        "b": true,
+        "p": 2,
+        "pz": 1
     },
     {
-        "Lefant robot": "https://www.amazon.it/dp/B0BPS134K8"
+        "Lefant robot": "https://www.amazon.it/dp/B0BPS134K8",
+        "b": true,
+        "p": 2,
+        "pz": 1
     },
     {
-        "Alm Nature Holistic": "https://www.amazon.it/dp/B01N6QJWVA"
+        "Alm Nature Holistic": "https://www.amazon.it/dp/B01N6QJWVA",
+        "b": true,
+        "p": 5,
+        "pz": 1
+    },
+    {
+        "ferro da stiro": "https://www.amazon.it/dp/B07BJTB1R5",
+        "b": true,
+        "p": 50,
+        "pz": 2
+    },
+    {
+        "AOC Agon Pro AG456UCZD": "https://www.amazon.it/dp/B0CX5K5HKC",
+        "b": true,
+        "p": 400,
+        "pz": 2
+    },
+    {
+        "": ""
+    },
+    {
+        "": ""
+    },
+    {
+        "": ""
     },
     {
         "": ""

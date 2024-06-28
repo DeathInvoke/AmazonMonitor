@@ -9,52 +9,64 @@ import {CouponInfo} from '../global.js'
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
 export async function search(query: string, suffix: string) {
-	const sanq = query.replace(/ /g, '+')
-	const url = `https://www.amazon.${suffix}/s?k=${sanq}`
+	const searchQuery = query.replace(/ /g, '+')
+	const url = `https://www.amazon.${suffix}/s?k=${searchQuery}`
 	const results: SearchData[] = []
 	const foundAsins: string[] = []
-	//await main()
 	const $ = await getPage(url)
 	const result_list_selector = '.s-result-list'
 	const limit = $(result_list_selector).find('.s-result-item').length
 
 	if (!limit || limit === 0) return results
 
-	$(result_list_selector).find('.s-result-item').each(function () {
-		if (results.length >= limit) return
-
-		const link = '/dp/' + $(this).find('.a-link-normal[href*="/dp/"]').first().attr('href')?.split('/dp/')[1].split('?')[0]
-
-		if (!link || link.includes('undefined')) return
-
-		const asin = linkToAsin(link)
-		const priceString = $(this).find('.a-price').find('.a-offscreen').first().text().trim()
-		const price = priceFormat($(this).find('.a-price').find('.a-offscreen').first().text().trim().replace(/[a-zA-Z]/g, ''))
-		const maybeCoupon = priceFormat($(this).find('.s-coupon-unclipped span').first().text().trim().replace(/[a-zA-Z]/g, ''))
-		const isPct = $(this).find('.s-coupon-unclipped span').first().text().trim().includes('%')
-
-		let couponInfo: CouponInfo = {
-			hasCoupon: !maybeCoupon.includes('NaN'),
-			isPercentage: isPct,
-			couponAbsoluteValue: parseFloat(maybeCoupon)
-		}
-		// prevent duplicates
-		if (foundAsins.includes(asin)) return
-		foundAsins.push(asin)
-
-		results.push({
-			fullTitle: $(this).find('span.a-text-normal').text().trim(),
-			ratings: $(this).find('.a-icon-alt').text().trim(),
-			coupon: couponInfo,
-			price: price.includes('NaN') ? '' : price,
-			lastPrice: parseFloat(price) || 0,
-			symbol: priceString.replace(/[,.]+/g, '').replace(/[\d a-zA-Z]/g, ''),
-			sale: $(this).find('.a.text.price').find('.a-offscreen').eq(1).text().trim(),
-			fullLink: `https://www.amazon.${suffix}/dp/${asin}`,
-			image: $(this).find('.s-image').attr('src'),
-			asin
-		})
+	const items = $(result_list_selector).find('.s-result-item').toArray()
+	const filtered = items.filter(i => {
+		const href = $(i).find('.a-link-normal[href*="/dp/"]').first().attr('href')
+		return href?.split('/dp/')[1].split('?')[0]
 	})
+
+	if(filtered.length > 0){
+		filtered.forEach(filteredItem => {
+			const link = '/dp/' + $(filteredItem).find('.a-link-normal[href*="/dp/"]').first().attr('href')?.split('/dp/')[1].split('?')[0].split('/')[0]
+
+			let hasCoupon = false
+			let couponVal: string
+
+			const asin = linkToAsin(link)
+			const priceString = $(filteredItem).find('.a-price').find('.a-offscreen').first().text().trim()
+			const price = priceFormat($(filteredItem).find('.a-price').find('.a-offscreen').first().text().trim().replace(/[a-zA-Z]/g, ''))
+			const couponField = $(filteredItem).find('.s-coupon-unclipped span').first().text().trim().replace(/[a-zA-Z]/g, '')
+			if(couponField && couponField !== ''){
+				hasCoupon = true
+				couponVal = priceFormat(couponField)
+			}
+			const isPct = $(filteredItem).find('.s-coupon-unclipped span').first().text().trim().includes('%')
+
+			let couponInfo: CouponInfo = {
+				hasCoupon: hasCoupon,
+				isPercentage: isPct,
+				couponAbsoluteValue: parseFloat(couponVal)
+			}
+
+			// prevent duplicates
+			if (foundAsins.includes(asin)) return
+			foundAsins.push(asin)
+
+			results.push({
+				fullTitle: $(filteredItem).find('span.a-text-normal').text().trim(),
+				ratings: $(filteredItem).find('.a-icon-alt').text().trim(),
+				coupon: couponInfo,
+				price: price.includes('NaN') ? '' : price,
+				lastPrice: parseFloat(price) || 0,
+				symbol: priceString.replace(/[,.]+/g, '').replace(/[\d a-zA-Z]/g, ''),
+				sale: $(filteredItem).find('.a.text.price').find('.a-offscreen').eq(1).text().trim(),
+				fullLink: `https://www.amazon.${suffix}/dp/${asin}`,
+				image: $(filteredItem).find('.s-image').attr('src'),
+				asin
+			})
+		})
+
+	}
 
 	return results
 }
@@ -346,8 +358,4 @@ export async function login() {
 	fs.writeFileSync('./localStorage.json', localStorage)
 
 	await page.close()
-}
-
-async function delay(ms: number) {
-	return new Promise(resolve => setTimeout(resolve, ms))
 }

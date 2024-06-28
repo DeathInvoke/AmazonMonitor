@@ -1,3 +1,6 @@
+// @ts-ignore
+import {CouponInfo} from '../global.js'
+
 export function linkToAsin(link: string) {
   return link?.split('/dp/')[1]?.split("?")[0] || link.split('/gp/product/')[1]?.split("?")[0]
 }
@@ -5,6 +8,23 @@ export function linkToAsin(link: string) {
 export function trim(str: string, toLength: number = 128) {
   if (str?.length > toLength) return str.slice(0, toLength - 3) + '...'
   return str
+}
+
+export function delay(ms: number) {
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
+/**
+ * Apply coupon value to given price
+ * @param fullPrice
+ * @param coupon
+ */
+export function applyCoupon(fullPrice: number, coupon: CouponInfo) {
+  if(coupon.isPercentage){
+    return fullPrice -= (fullPrice/100) * coupon.couponAbsoluteValue
+  }else{
+    return fullPrice -= coupon.couponAbsoluteValue
+  }
 }
 
 /**

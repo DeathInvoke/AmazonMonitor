@@ -93,7 +93,7 @@ bot.on('ready', async () => {
 
 	await startWatcher(bot)
 
-	startServer()
+	//startServer()
 
 	debug.log('Bot is ready!', 'info')
 })
@@ -124,7 +124,7 @@ bot.on('messageCreate', function (message: Discord.Message) {
 
 async function exec(message: Discord.Message, args: string[], cmd: Command) {
 	const ch = await message.channel.fetch()
-	ch.sendTyping()
+	await ch.sendTyping()
 
 	await cmd.run(bot, message, args).catch((e: Error) => {
 		message.channel.send(e.message)

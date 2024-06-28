@@ -14,6 +14,7 @@ import {sendNotifications, sendPerformedAutobuy} from './notifications.js'
 import {autobuy} from './buyer.js'
 // @ts-ignore
 import {LinkItem} from '../global.js'
+import {applyCoupon} from './utils.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -203,9 +204,9 @@ async function queryCheck(query: QueryItem) {
 		if (matchingObj.lastPrice === item.lastPrice) return
 
 		// if the obj has a coupon, modify the lastprice to reflect that
-		/*if (matchingObj?.coupon > 0) {
-		  matchingObj.lastPrice -= matchingObj.coupon
-		}*/
+		if (matchingObj?.coupon.hasCoupon) {
+			matchingObj.lastPrice = applyCoupon(matchingObj.lastPrice, matchingObj.coupon)
+		}
 
 		//const newPriceWithCoupon = item.coupon > 0 ? item.lastPrice - item.coupon : item.lastPrice
 

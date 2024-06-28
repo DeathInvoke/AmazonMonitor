@@ -14,6 +14,8 @@ interface LogTypes {
 export function log(message: string | object, type: keyof LogTypes = 'debug', override = false) {
   let t
   /* eslint-disable indent */
+  const timestamp = new Date().toLocaleString()
+
   switch(type.toLowerCase()) {
     default:
     case 'log': t = chalk.blue('[LOG] ')
@@ -26,7 +28,7 @@ export function log(message: string | object, type: keyof LogTypes = 'debug', ov
       break
     case 'info': t = chalk.magenta('[MESSAGE] ')
   }
-
+  t += `[ts=${timestamp}] `
   if(debug_enabled || override) console.log(t, message)
 }
 
