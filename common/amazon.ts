@@ -167,14 +167,14 @@ export async function item(url: string) {
 
 async function parseItem($: CheerioAPI, url: string): Promise<ProductInfo> {
 	debug.log('Detected as a regular item', 'debug')
-
+	const coupon = $('label[id*="couponTextpctch"]')
 	let couponDiscount = 0
 	let isCouponPercentage: boolean = false
-	const hasCoupon: boolean = $('label[id*="couponTextpctch"]').text().trim() !== ''
+	const hasCoupon: boolean = coupon.text().trim() !== ''
 	// Get the coupon price, if it exists
 	if (hasCoupon) {
-		couponDiscount = parseInt($('label[id*="couponTextpctch"]').text().trim().match(/(\d+)/)[0], 10) || 0
-		isCouponPercentage = $('label[id*="couponTextpctch"]').text().includes('%')
+		couponDiscount = parseInt(coupon.text().trim().match(/(\d+)/)[0], 10) || 0
+		isCouponPercentage = coupon.text().includes('%')
 	}
 	// -----------------------------------------------------------------------------
 	// -----------------------------------------------------------------------------

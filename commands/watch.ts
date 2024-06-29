@@ -156,7 +156,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 			return
 		}
 
-		addWatchlistItem({
+		await addWatchlistItem({
 			guildId: message.guildId,
 			channelId: message.channelId,
 			type: 'category',
@@ -191,7 +191,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 			return
 		}
 
-		addWatchlistItem({
+		await addWatchlistItem({
 			guildId: message.guildId,
 			channelId: message.channelId,
 			type: 'query',

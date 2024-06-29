@@ -7,6 +7,8 @@ import {startWatcher} from './common/watcher.js'
 import {getCategoryTree} from './common/categories.js'
 import {startServer} from './api.js'
 import {login} from './common/amazon.js'
+// @ts-ignore
+import {Command} from './global.js'
 
 declare global {
 	var browser: import('puppeteer').Browser
@@ -113,10 +115,12 @@ bot.on('messageCreate', function (message: Discord.Message) {
 
 		switch (cmd.type) {
 		case 'view':
-			exec(message, args, cmd)
+			const promise = exec(message, args, cmd)
 			break
 		case 'edit':
-			if (message.member.permissions.has(config.required_perms)) exec(message, args, cmd)
+			if (message.member.permissions.has(config.required_perms)) {
+				const promise = exec(message, args, cmd)
+			}
 			break
 		}
 	}
