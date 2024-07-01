@@ -15,7 +15,7 @@ export async function initBrowser() {
 	const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 	globalThis.browser = await pup.launch({
 		// @ts-ignore
-		headless: false,//'new',
+		headless: true,//'new',
 		protocolTimeout: 360000,
 		timeout: 40000,
 		args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
