@@ -320,31 +320,34 @@ export async function login() {
 	const page = await global?.browser.newPage()
 
 	debug.log(`Logging to ${config.email}...`, 'debug', true)
-	await page.setUserAgent('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0')
-	await page.goto(LOGIN_URL, {waitUntil: 'domcontentloaded'})
 
 	const email = config.email
 	const psw = config.psw
 
-	await page.$eval('input#ap_email',
-	  (el, email) => {
-		  el.value = email
-	  },
-	  email)
+	await Promise.all([
+		await page.setUserAgent('Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0'),
+		await page.goto(LOGIN_URL, {waitUntil: 'domcontentloaded'}) ,
+		await page.$eval('input#ap_email',
+		  (el, email) => {
+			  el.value = email
+		  },
+		  email),
 
-	//await delay(1000) /// waiting 1 second.
-	await page.waitForSelector('#continue')
-	await page.click('#continue')
-	await page.waitForSelector('#ap_password')
+		await page.waitForSelector('#continue'),
+		await page.click('#continue'),
+		await page.waitForSelector('#ap_password'),
 
-	await page.$eval('input#ap_password',
-	  (el, psw) => {
-		  el.value = psw
-	  }, psw)
-	//await delay(1000)
-	await page.waitForSelector('#signInSubmit')
-	await page.click('#signInSubmit')
-	await page.waitForNavigation({waitUntil: 'domcontentloaded'})
+		await page.$eval('input#ap_password',
+		  (el, psw) => {
+			  el.value = psw
+		  }, psw),
+		//await delay(1000)
+		await page.waitForSelector('#signInSubmit'),
+		await page.click('#signInSubmit'),
+		await page.waitForNavigation({waitUntil: 'domcontentloaded'}),
+
+	]);
+
 
 	const cookies = JSON.stringify(await page.cookies())
 

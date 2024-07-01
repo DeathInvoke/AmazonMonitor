@@ -1,20 +1,15 @@
 /* eslint-disable indent */
 import {ActivityType, Client} from 'discord.js'
 import fs from 'fs'
-import {
-	addWatchlistItem,
-	getWatchlist,
-	removeWatchlistItem,
-	retrieveWatchListItem,
-	updateWatchlistItem
-} from './watchlist.js'
+import {addWatchlistItem, getWatchlist, removeWatchlistItem} from './watchlist.js'
 import debug from './debug.js'
-import {item, category, search} from './amazon.js'
+import {category, item, search} from './amazon.js'
 import {sendNotifications, sendPerformedAutobuy} from './notifications.js'
-import {autobuy} from './buyer.js'
 // @ts-ignore
 import {LinkItem} from '../global.js'
 import {applyCoupon} from './utils.js'
+import {autobuy} from './buyer.js'
+
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -115,6 +110,7 @@ async function itemCheck(product: LinkItem, bot: Client) {
 	if (mustBuy && underPriceLimit && product.bought <= product.piecesToBuy) {
 		const nextBuy = product.bought + 1
 		debug.log(`Calling autobuy function for ${product.itemName} for the ${nextBuy}th time`, 'debug')
+
 		const success: boolean = await autobuy(product.link, hasCoupon)
 		if (success) {
 			await removeWatchlistItem(product.link)

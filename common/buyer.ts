@@ -14,9 +14,12 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 	try {
 
 		if (hasCoupon) {
-			await _applyCouponInPage(page)
-			await delay(500)
+			await Promise.all([
+				await _applyCouponInPage(page),
+				await delay(500)
+			])
 		}
+
 		await _clickOnElement(page, buy_now_selector)
 
 		const isThereSubmit = await _checkIfElementExists(page, submit_btn_selector)
@@ -27,25 +30,30 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 			}
 		}
 
-		await page.waitForSelector(submit_btn_selector)
-		await delay(500)
+		await Promise.all([
+			await page.waitForSelector(submit_btn_selector),
+			await delay(500),
 
-		await _clickOnElement(page, submit_btn_selector)
-		await page.waitForNavigation()
-		//await page.waitForSelector(force_double_order_selector_name, {timeout: 2000}).
-		await delay(500)
+			await _clickOnElement(page, submit_btn_selector),
+			await page.waitForNavigation({waitUntil: 'load'}),
+			//await page.waitForSelector(force_double_order_selector_name, {timeout: 2000}).
+			await delay(500)
+		])
+
+
 
 		const isDouble = await _checkIfElementExists(page, force_double_order_selector_name)
 		if (isDouble) {
 			await _clickOnElement(page, force_double_order_selector_name)
 		}
 
-		await delay(500)
-		await page.waitForSelector(save_order_selector, {timeout: 5000})
-
-		await _clickOnElement(page, save_order_selector)
-		await page.waitForNavigation()
-		await delay(500)
+		await Promise.all([
+			await delay(500),
+			await page.waitForSelector(save_order_selector, {timeout: 5000}),
+			await _clickOnElement(page, save_order_selector),
+			await page.waitForNavigation(),
+			await delay(500)
+		])
 
 		return true
 	} catch (error) {

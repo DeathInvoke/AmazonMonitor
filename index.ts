@@ -5,7 +5,6 @@ import * as debug from './common/debug.js'
 import {initBrowser} from './common/browser.js'
 import {startWatcher} from './common/watcher.js'
 import {getCategoryTree} from './common/categories.js'
-import {startServer} from './api.js'
 import {login} from './common/amazon.js'
 // @ts-ignore
 import {Command} from './global.js'
@@ -14,7 +13,6 @@ declare global {
 	var browser: import('puppeteer').Browser
 }
 
-const __dirname = import.meta.url.split('/').slice(0, -1).join('/')
 
 const bot = new Discord.Client({
 	intents: [
@@ -66,10 +64,10 @@ bot.on('ready', async () => {
 		debug.log('This message is not an error, and the bot is still running.', 'warn', true)
 	}
 
-	if (__dirname.indexOf(' ') !== -1) {
+	/*if (__dirname.indexOf(' ') !== -1) {
 		debug.log('The current path the bot resides in contains spaces. Please move it somewhere that does not contain spaces.', 'error', true)
 		process.exit()
-	}
+	}*/
 
 	const env = config.dev ? 'DEV' : 'PROD'
 	debug.log(`Current environment is ${env}`, 'info', true)
@@ -128,10 +126,13 @@ bot.on('messageCreate', function (message: Discord.Message) {
 
 async function exec(message: Discord.Message, args: string[], cmd: Command) {
 	const ch = await message.channel.fetch()
-	await ch.sendTyping()
+	await Promise.all([
+		await ch.sendTyping(),
 
-	await cmd.run(bot, message, args).catch((e: Error) => {
-		message.channel.send(e.message)
-		debug.log(e, 'error')
-	})
+		await cmd.run(bot, message, args).catch((e: Error) => {
+			message.channel.send(e.message)
+			debug.log(e, 'error')
+		})
+	])
+
 }
