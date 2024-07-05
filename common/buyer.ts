@@ -23,12 +23,12 @@ export async function autobuy(link: string, hasCoupon: boolean) {
 		await _clickOnElement(page, buy_now_selector)
 
 		const isThereSubmit = await _checkIfElementExists(page, submit_btn_selector)
-		if(!isThereSubmit){
+		/*if(!isThereSubmit){
 			const isThereError = await _checkIfElementExists(page, error_selector)
 			if(isThereError){
 				return false
 			}
-		}
+		}*/
 
 		await Promise.all([
 			await page.waitForSelector(submit_btn_selector),

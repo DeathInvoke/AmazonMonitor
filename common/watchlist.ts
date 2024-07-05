@@ -1,6 +1,6 @@
 import fs from 'fs'
 // @ts-ignore
-import {LinkItem} from '../global.js'
+import {CustomFilterItem, LinkItem} from '../global.js'
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 const tld: string = config.tld
 const watchFile = `./watchlist_${tld}.json`
@@ -25,7 +25,7 @@ export const getWatchlist = async () => {
 /**
  * Add new item.
  */
-export const addWatchlistItem = async (data: LinkItem | CategoryItem | QueryItem) => {
+export const addWatchlistItem = async (data: LinkItem | CategoryItem | QueryItem | CustomFilterItem) => {
   const watchlist: Watchlist = JSON.parse(fs.readFileSync(watchFile).toString())
   watchlist.push(data)
   fs.writeFileSync(watchFile, JSON.stringify(watchlist), 'utf-8')
@@ -48,7 +48,7 @@ export const removeWatchlistItem = async (url: string) => {
   fs.writeFileSync(watchFile, JSON.stringify(watchlist), 'utf-8')
 }
 
-export function retrieveWatchListItem(url: string): LinkItem | CategoryItem | QueryItem {
+export function retrieveWatchListItem(url: string): LinkItem | CategoryItem | QueryItem | CustomFilterItem {
   const watchlist: Watchlist = JSON.parse(fs.readFileSync(watchFile).toString())
   const item = watchlist.find(x => {
     // @ts-ignore TS stupid
@@ -63,7 +63,7 @@ export function retrieveWatchListItem(url: string): LinkItem | CategoryItem | Qu
 /**
  * Update item.
  */
-export const updateWatchlistItem = async (data: LinkItem | CategoryItem | QueryItem, condition: Conditions) => {
+export const updateWatchlistItem = async (data: LinkItem | CategoryItem | QueryItem |CustomFilterItem, condition: Conditions) => {
   let watchlist: Watchlist = JSON.parse(fs.readFileSync(watchFile).toString())
   /**
    * The stuff ahead doesn't make a lot of sense so I'll try my best to explain:

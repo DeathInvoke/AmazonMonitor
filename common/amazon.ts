@@ -8,9 +8,14 @@ import {CouponInfo} from '../global.js'
 
 const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
-export async function search(query: string, suffix: string) {
-	const searchQuery = query.replace(/ /g, '+')
-	const url = `https://www.amazon.${suffix}/s?k=${searchQuery}`
+export async function search(query: string, suffix: string, isCustom: boolean) {
+	let url: string = query
+
+	if(isCustom){
+		const searchQuery = query.replace(/ /g, '+')
+		url = `https://www.amazon.${suffix}/s?k=${searchQuery}`
+	}
+
 	const results: SearchData[] = []
 	const foundAsins: string[] = []
 	const $ = await getPage(url)
@@ -69,6 +74,22 @@ export async function search(query: string, suffix: string) {
 	}
 
 	return results
+}
+
+export async function itemsFromCustomFiltersUrl(link: string, suffix: string){
+	const results: SearchData[] = []
+
+	const tld = link.match(/(https:\/\/www\.amazon\.)([a-z]+)\//gm)[1]
+	if(suffix !== tld){
+		debug.log('Invalid amazon url from different country.', 'error')
+		return results
+	}
+
+	const searchData = await search(link, suffix, true)
+
+	const $ = await getPage(link)
+
+
 }
 
 export async function category(url: string) {

@@ -4,7 +4,7 @@ import {Client, Message} from 'discord.js'
 import {category, item, search} from '../common/amazon.js'
 import {parseArgs} from '../common/arguments.js'
 // @ts-ignore
-import {LinkItem} from '../global.js'
+import {CustomFilterItem, LinkItem} from '../global.js'
 
 const {cache_limit, tld, guild_item_limit}: Config = JSON.parse(fs.readFileSync('./config.json').toString())
 
@@ -31,6 +31,11 @@ const argDef = {
 	category: {
 		name: 'category',
 		aliases: ['c'],
+		type: 'string'
+	},
+	customFilters: {
+		name: 'customFilters',
+		aliases: ['fu'],
 		type: 'string'
 	},
 	priceLimit: {
@@ -64,7 +69,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 	const watchlist: Watchlist = await getWatchlist()
 	const processed = parseArgs(args, argDef)
 
-	processed.type = processed.link ? 'link' : processed.query ? 'query' : processed.category ? 'category' : null
+	processed.type = processed.link ? 'link' : processed.query ? 'query' : processed.category ? 'category' : processed.customFilters ? 'customFilters' : null
 
 	if (watchlist.length >= guild_item_limit) {
 		message.channel.send(`Hai raggiunto il limite massimo di prodotti da osservare (${guild_item_limit})`)
@@ -126,7 +131,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 
 		response = `Prodotto aggiunto con successo: ${processed.link}`
 
-		if(piecesToBuy){
+		if (piecesToBuy) {
 			response += `\nIl numero di pezzi da acquistare è: ${piecesToBuy}`
 		}
 
@@ -207,13 +212,28 @@ async function run(bot: Client, message: Message, args: string[]) {
 
 		break
 	}
+	case 'customFilters': {
+
+		// @ts-ignore
+		const existing = watchlist.find(item => item.link === processed.link)
+
+		if(existing){
+			message.channel.send('Il link è già presente nella watchlist')
+			return
+		}
+
+		// @ts-ignore this is guaranteed to be a query
+		const results = await search(processed.query, tld)
+
+		break
+	}
 	}
 
 	// Add the extras for price difference, price percentage, and price limit
 	let symbol: string | number = ''
-	if(processed.symbol && processed.symbol != ''){
+	if (processed.symbol && processed.symbol != '') {
 		symbol = processed.symbol as string
-	}else{
+	} else {
 		symbol = '$'
 	}
 	const currency = `${symbol}`
@@ -232,7 +252,7 @@ async function run(bot: Client, message: Message, args: string[]) {
 	}
 
 	const autobuy: boolean = processed.autobuy as boolean
-	if (autobuy){
+	if (autobuy) {
 		response += '\nPer questo prodotto è stata attivata la funzione di autobuy'
 	}
 

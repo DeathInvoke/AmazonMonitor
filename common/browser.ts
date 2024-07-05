@@ -1,8 +1,16 @@
-import pup from 'puppeteer'
+import pup, {executablePath} from 'puppeteer'
 import fs from 'fs'
 import debug from './debug.js'
 import {load} from 'cheerio'
 import {delay} from './utils.js'
+
+import puppeteer from 'puppeteer-extra'
+// @ts-ignore
+import {Config} from '../global.js'
+
+// add stealth plugin and use defaults
+import pluginStealth from 'puppeteer-extra-plugin-stealth'
+import {resolve} from './captcha_resolver.js'
 
 const userAgents = [
 	'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0',
@@ -13,11 +21,17 @@ const userAgents = [
 
 export async function initBrowser() {
 	const config: Config = JSON.parse(fs.readFileSync('./config.json').toString())
-	globalThis.browser = await pup.launch({
+
+	// use stealth
+	// @ts-ignore
+	puppeteer.use(pluginStealth())
+	// @ts-ignore
+	globalThis.browser = await puppeteer.launch({
 		// @ts-ignore
 		headless: true,//'new',
 		protocolTimeout: 360000,
 		timeout: 40000,
+		//slowMo: 5000,
 		args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
 		...(config.custom_chromium_exec && {executablePath: config.custom_chromium_exec})
 	})
@@ -105,6 +119,37 @@ export async function getPage(url: string) {
 
 	//await page.reload()
 	debug.log('Waiting a couple seconds for JavaScript to load...', 'info')
+
+	// Check for captcha page and trying to resolve it
+	/*const captcha_selector: string = 'img[src*="Captcha"]'
+
+	const el = await page.evaluate((captcha_selector: string) => {
+		let c = document.querySelector(captcha_selector)
+		if(c){
+			console.log(c)
+
+		}
+	}, captcha_selector)
+
+	let isCaptchaFound: boolean = false
+	try {
+		await page.waitForSelector(captcha_selector, {timeout: 5000}) // you can adjust the timeout
+		isCaptchaFound = true
+	} catch (error) {
+		debug.log(`Captcha not found... continue`, 'warn')
+		return false
+	}
+
+	if(isCaptchaFound){
+		await page.$eval(captcha_selector, async el => {
+			const url = el.getAttribute('src').trim()
+			debug.log(`Captcha url = ${url}`, 'debug')
+			if (url) {
+				const value = await resolve(url)
+				debug.log(`Captcha resolved with value: ${value}`, 'debug')
+			}
+		}, captcha_selector)
+	}*/
 
 	//await new Promise(r => setTimeout(r, 1500))
 

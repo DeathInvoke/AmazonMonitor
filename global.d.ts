@@ -94,7 +94,12 @@ interface QueryItem extends PartialWatchlistItem {
   cache: SearchData[]
 }
 
-type Watchlist = Array<LinkItem | CategoryItem | QueryItem>
+interface CustomFilterItem extends PartialWatchlistItem {
+  link: string
+  cache: SearchData[]
+}
+
+type Watchlist = Array<LinkItem | CategoryItem | QueryItem | CustomFilterItem>
 
 interface SearchData {
   fullTitle: string

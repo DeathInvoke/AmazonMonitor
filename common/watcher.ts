@@ -186,7 +186,7 @@ async function categoryCheck(cat: CategoryItem) {
 }
 
 async function queryCheck(query: QueryItem) {
-	const newItems = await search(query.query, config.tld)
+	const newItems = await search(query.query, config.tld, false)
 	const itemsToCompare = newItems.filter((ni) =>
 	  query.cache.find((o) => o.asin === ni.asin)
 	)

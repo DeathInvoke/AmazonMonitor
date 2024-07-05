@@ -8,6 +8,7 @@ import {getCategoryTree} from './common/categories.js'
 import {login} from './common/amazon.js'
 // @ts-ignore
 import {Command} from './global.js'
+import {resolve} from './common/captcha_resolver.js'
 
 declare global {
 	var browser: import('puppeteer').Browser
